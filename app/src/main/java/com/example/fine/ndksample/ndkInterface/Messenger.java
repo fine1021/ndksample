@@ -12,12 +12,12 @@ public class Messenger {
      * Lock used to modify the content of {@link #sCallBacks}. Any write operation
      * performed on the array should be synchronized on this lock.
      */
-    private static final Object mLock = new Object();
+    private static final Object sMutex = new Object();
 
     private static ArrayList<MessageCallBack> sCallBacks = new ArrayList<>();
 
     public static void addListener(MessageCallBack callBack) {
-        synchronized (mLock) {
+        synchronized (sMutex) {
             if (!sCallBacks.contains(callBack)) {
                 sCallBacks.add(callBack);
             }
@@ -25,7 +25,7 @@ public class Messenger {
     }
 
     public static void removeListener(MessageCallBack callBack) {
-        synchronized (mLock) {
+        synchronized (sMutex) {
             if (sCallBacks.contains(callBack)) {
                 sCallBacks.remove(callBack);
             }
@@ -33,8 +33,10 @@ public class Messenger {
     }
 
     public void notifyMessage(String msg) {
-        for (MessageCallBack callBack : sCallBacks) {
-            callBack.onCallBack(msg);
+        synchronized (sMutex) {
+            for (MessageCallBack callBack : sCallBacks) {
+                callBack.onCallBack(msg);
+            }
         }
     }
 
