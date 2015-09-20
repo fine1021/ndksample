@@ -1,5 +1,3 @@
-#include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"
-#include "SocketUtil.h"
 /*
  * Class:     com_yxkang_jnisocket_HttpUtil
  * Method:    doPostRequest
@@ -15,7 +13,7 @@ JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring string, jint i) {
-    return string;
+    return (*env)->NewStringUTF(env, "Hello from JNI ! ");
 }
 
 /*
@@ -27,13 +25,29 @@ JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_H
 
 	LOGD("doSocketConnect!");
 	const char *ip = (*env)->GetStringUTFChars(env, string, NULL);
-	char IP[100];
-	strncpy(IP, ip, sizeof(IP));
-	initSocket(IP, 80);
+notifyMessageObj(env, obj,
+"initSocket");
+
+initSocket(constCharToChar(ip), i
+
+);
+notifyMessageObj(env, obj,
+"connectSocket");
 	connectSocket();
+
+notifyMessageObj(env, obj,
+"sendMessage");
 	sendMessage("hello");
 	char msg[BUFFER_SIZE] = {0};
+notifyMessageObj(env, obj,
+"recvMessage");
 	recvMessage(msg);
+notifyMessageObj(env, obj,
+"closeSocket");
     closeSocket();
+
+(*env)->
+ReleaseStringUTFChars(env, string, ip
+);
     return string;
 }

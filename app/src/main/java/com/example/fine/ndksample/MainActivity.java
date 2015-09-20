@@ -6,18 +6,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.fine.ndksample.ndkInterface.HttpUtil;
+import com.example.fine.ndksample.ndkInterface.Messenger;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     @SuppressWarnings("FieldCanBeLocal")
     private Button mSocketButton;
+    private TextView textView;
+    private Messenger.MessageCallBack callBack = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        textView = (TextView) findViewById(R.id.textView);
         mSocketButton = (Button) findViewById(R.id.socketButton);
         mSocketButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -25,6 +31,18 @@ public class MainActivity extends AppCompatActivity {
                 socketConnect();
             }
         });
+        callBack = new Messenger.MessageCallBack() {
+            @Override
+            public void onCallBack(final String msg) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setText(msg);
+                    }
+                });
+            }
+        };
+        Messenger.addListener(callBack);
     }
 
     /**
@@ -37,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
                 HttpUtil.socketConnect("115.239.210.27", 80);
             }
         }).start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (callBack != null) {
+            Messenger.removeListener(callBack);
+        }
     }
 
     @Override
