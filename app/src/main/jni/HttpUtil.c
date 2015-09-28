@@ -1,3 +1,6 @@
+#include "util/char.h"
+#include "util/socket.h"
+
 /*
  * Class:     com_yxkang_jnisocket_HttpUtil
  * Method:    doPostRequest
@@ -25,29 +28,17 @@ JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_H
 
 	LOGD("doSocketConnect!");
 	const char *ip = (*env)->GetStringUTFChars(env, string, NULL);
-notifyMessageObj(env, obj,
-"initSocket");
-
-initSocket(constCharToChar(ip), i
-
-);
-notifyMessageObj(env, obj,
-"connectSocket");
+    notifyMessageObj(env, obj,"initSocket");
+    initSocket(constCharToChar(ip), i);
+    notifyMessageObj(env, obj,"connectSocket");
 	connectSocket();
-
-notifyMessageObj(env, obj,
-"sendMessage");
+    notifyMessageObj(env, obj,"sendMessage");
 	sendMessage("hello");
 	char msg[BUFFER_SIZE] = {0};
-notifyMessageObj(env, obj,
-"recvMessage");
+    notifyMessageObj(env, obj,"recvMessage");
 	recvMessage(msg);
-notifyMessageObj(env, obj,
-"closeSocket");
+    notifyMessageObj(env, obj,"closeSocket");
     closeSocket();
-
-(*env)->
-ReleaseStringUTFChars(env, string, ip
-);
+    (*env)->ReleaseStringUTFChars(env, string, ip);
     return string;
 }
