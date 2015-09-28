@@ -16,7 +16,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# LOCAL_CPP_EXTENSION := .cpp
+LOCAL_CPP_EXTENSION := .cpp
 
 LOCAL_LDLIBS := -lm -llog
 

@@ -8,9 +8,6 @@
 #include <jni.h>
 #include <android/log.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #define DEBUG
 
 #define LOG_TAG "NativeMethod"
@@ -25,7 +22,7 @@
  * jni String Type : java/lang/String  or  Ljava/lang/String;
  * javap -s xx.class query parameter type
  */
-void notifyMessage(JNIEnv *env, jobject obj, char *msg) {
+void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
     jclass cls = (*env)->FindClass(env, "com/example/fine/ndksample/ndkInterface/Messenger");
     if (cls == 0) {
         LOGE("find class error");
@@ -72,7 +69,7 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
  * call java class method
  * the java class which calls jni native methods, is not the class which has callbacks
  */
-void notifyMessageObj(JNIEnv *env, jobject obj, char *msg) {
+void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
     jclass cls = (*env)->FindClass(env, "com/example/fine/ndksample/ndkInterface/Messenger");
     if (cls == 0) {
         LOGE("find class error");

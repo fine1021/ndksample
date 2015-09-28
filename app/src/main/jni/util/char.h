@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +19,11 @@ const char *charToConstChar(char *str) {
     return (const char *) str;
 }
 
+//const char *stringToConstChar(string str) {
+//    return str.c_str();
+//}
+
 #ifdef __cplusplus
 }
 #endif
+#pragma clang diagnostic pop
