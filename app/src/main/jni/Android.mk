@@ -14,12 +14,10 @@
 #
 LOCAL_PATH := $(call my-dir)
 
+LOCAL_CPP_EXTENSION := .cpp
 include $(CLEAR_VARS)
 
-# LOCAL_CPP_EXTENSION := .cpp
-
-LOCAL_LDLIBS := -lm -llog
-
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE    := socket
 LOCAL_SRC_FILES := HttpUtil.c
 
