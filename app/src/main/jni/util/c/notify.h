@@ -1,21 +1,10 @@
 //
-// Created by yexiaokang on 2015/9/2.
+// Created by yexiaokang on 2015/9/29.
 //
 
-#ifndef JNISOCKET_COMMON_H
-#define JNISOCKET_COMMON_H
+#ifndef NDKSAMPLE_NOTIFY_H
+#define NDKSAMPLE_NOTIFY_H
 
-#include <jni.h>
-#include <android/log.h>
-
-#define DEBUG
-
-#define LOG_TAG "NativeMethod"
-
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
-#define  LOGW(...)  __android_log_print(ANDROID_LOG_WARN,LOG_TAG ,__VA_ARGS__)
 
 /**
  * call java class method
@@ -28,7 +17,6 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
         LOGE("find class error");
         return;
     }
-    LOGI("find class");
 
     // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
     jmethodID method = (*env)->GetMethodID(env, cls, "notifyMessage", "(Ljava/lang/String;)V");
@@ -36,7 +24,6 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
         LOGE("find method error");
         return;
     }
-    LOGI("find method ");
 
     // void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
     (*env)->CallVoidMethod(env, obj, method, (*env)->NewStringUTF(env, msg));
@@ -51,18 +38,15 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
         LOGE("find class error");
         return;
     }
-    LOGI("find class");
     // jmethodID (*GetStaticMethodID)(JNIEnv*, jclass, const char*, const char*);
-    jmethodID method = (*env)->GetStaticMethodID(env, cls, "notifyMessage",
-                                                 "(Ljava/lang/String;)V");
+    jmethodID method = (*env)->GetStaticMethodID(env, cls, "notifyMessage", "(Ljava/lang/String;)V");
     if (method == 0) {
         LOGE("find method error");
         return;
     }
-    LOGI("find method ");
 
-    // void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
-    (*env)->CallStaticVoidMethod(env, obj, method, (*env)->NewStringUTF(env, msg));
+    // void (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...);
+    (*env)->CallStaticVoidMethod(env, cls, method, (*env)->NewStringUTF(env, msg));
 }
 
 /**
@@ -75,7 +59,6 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
         LOGE("find class error");
         return;
     }
-    LOGI("find class");
 
     // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
     // java/lang/String Ljava/lang/String;
@@ -84,7 +67,6 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
         LOGE("find method error");
         return;
     }
-    LOGI("find method ");
 
     //  void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
     //  jobject (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
@@ -96,7 +78,7 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
 }
 
 
-#endif //JNISOCKET_COMMON_H
+#endif //NDKSAMPLE_NOTIFY_H
 
 /*
 jobject     (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
