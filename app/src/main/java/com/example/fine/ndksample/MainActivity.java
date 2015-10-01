@@ -1,6 +1,7 @@
 package com.example.fine.ndksample;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,13 +11,12 @@ import android.widget.TextView;
 
 import com.example.fine.ndksample.ndkInterface.HttpUtil;
 import com.example.fine.ndksample.ndkInterface.Messenger;
+import com.yxkang.android.os.WeakReferenceHandler;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
-    @SuppressWarnings("FieldCanBeLocal")
-    private Button mSocketButton;
     private TextView textView;
+    private InternalHandler mHandler = new InternalHandler(this);
     private Messenger.MessageCallBack callBack = null;
 
     @Override
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        mSocketButton = (Button) findViewById(R.id.socketButton);
+        Button mSocketButton = (Button) findViewById(R.id.socketButton);
         mSocketButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,25 +34,23 @@ public class MainActivity extends AppCompatActivity {
         callBack = new Messenger.MessageCallBack() {
             @Override
             public void onCallBack(final String msg) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        textView.setText(msg);
-                    }
-                });
+                mHandler.sendMessage(mHandler.obtainMessage(1, msg));
             }
         };
         Messenger.addListener(callBack);
     }
 
-    /**
-     * IP : www.baidu.com  --->  115.239.210.27
-     */
+    private void setTextView(final String text) {
+        textView.setText(text);
+    }
+
     private void socketConnect() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HttpUtil.socketConnect("115.239.210.27", 80);
+                HttpUtil.socketConnect("www.baidu.com", 80);
+                //HttpUtil.socketConnect("sae.sina.com.cn", 80);
+                //HttpUtil.socketConnect("123.125.23.91", 80);
             }
         }).start();
     }
@@ -63,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         if (callBack != null) {
             Messenger.removeListener(callBack);
         }
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -85,5 +84,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private static class InternalHandler extends WeakReferenceHandler<MainActivity> {
+
+        public InternalHandler(MainActivity reference) {
+            super(reference);
+        }
+
+        @Override
+        protected void handleMessage(MainActivity mainActivity, Message message) {
+            mainActivity.setTextView(message.obj.toString());
+        }
     }
 }

@@ -5,7 +5,6 @@
 
 #include "util/char.h"
 #include "util/cplusplus/socket.cpp"
-#include "util/cplusplus/notify.h"
 #include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"
 
 /*
@@ -31,21 +30,18 @@ JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_
  * Method:    doSocketConnect
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring ip, jint port) {
+JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring host, jint port) {
     LOGD("doSocketConnect!");
     SocketHelper socketHelper;
-    const char *temp = env->GetStringUTFChars(ip, NULL);
-    notifyMessageObj(env, obj, StringToChar("initSocket"));
+    socketHelper.initEnv(env,obj);
+    const char *temp = env->GetStringUTFChars(host, NULL);
     socketHelper.createSocket(ConstCharToChar(temp), port);
-    env->ReleaseStringUTFChars(ip, temp);
-    notifyMessageObj(env, obj, StringToChar("connectSocket"));
     socketHelper.connectSocket();
-    notifyMessageObj(env, obj, StringToChar("sendMessage"));
-    socketHelper.sendMessage(StringToChar("hello"));
-    char msg[BUFFER_SIZE] = {0};
-    notifyMessageObj(env, obj, StringToChar("recvMessage"));
+    socketHelper.sendHttpGetMsg(ConstCharToChar(temp));
+    //socketHelper.sendMessage(StringToChar("hello"));
+    char msg[PACKET_SIZE] = {0};
     socketHelper.recvMessage(msg);
-    notifyMessageObj(env, obj, StringToChar("closeSocket"));
     socketHelper.closeSocket();
-    return env->NewStringUTF("Hello from JNI !");
+    env->ReleaseStringUTFChars(host, temp);
+    return env->NewStringUTF(msg);
 }

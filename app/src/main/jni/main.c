@@ -36,7 +36,7 @@ JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_H
 	connectSocket();
     notifyMessageObj(env, obj,"sendMessage");
 	sendMessage("hello");
-	char msg[BUFFER_SIZE] = {0};
+	char msg[PACKET_SIZE] = {0};
     notifyMessageObj(env, obj,"recvMessage");
 	recvMessage(msg);
     notifyMessageObj(env, obj,"closeSocket");

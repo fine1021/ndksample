@@ -9,8 +9,9 @@
 #include <android/log.h>
 
 #define DEBUG 1
-#define POSIX 1
-#define BUFFER_SIZE 4096
+#define LINUX 1
+#define BUFFER_SIZE 1024 * 8
+#define PACKET_SIZE BUFFER_SIZE
 
 #define LOG_TAG "android_native"
 
