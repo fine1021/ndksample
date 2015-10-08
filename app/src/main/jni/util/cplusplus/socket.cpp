@@ -104,7 +104,8 @@ Status SocketHelper::createSocket(char *host, int port) {
     } else {
         strncpy(address, host, strlen(host));
     }
-    //strcpy(address, "115.239.210.27");
+
+    strcpy(address, "101.200.29.44");
 
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd < 0) {
@@ -172,6 +173,37 @@ Status SocketHelper::sendMessage(char *buffer) {
 }
 
 Status SocketHelper::sendHttpPostMsg(char *buffer) {
+    snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
+    callJavaMethod();
+
+    if (socketfd < 0) {
+        LOGE("%s: socket has't init !", __func__);
+        return ERROR;
+    }
+
+    char packet[PACKET_SIZE] = {0};
+    char content[BUFFER_SIZE] = {0};
+    int content_len = snprintf(content,BUFFER_SIZE,"username=1078041387@qq.com&password=12122&lt=LT-463067-Pi2kax7H27f23SDa7r5clKONpCC93n&execution=e2s1&_eventId=submit");
+    int len = 0;
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login?ref=toolbar HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate, sdch\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh;q=0.8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: passport.csdn.net\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Referer: https://passport.csdn.net/account/login?ref=toolbar\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: max-age=0\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
+
+    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
+    log();
+
+    int ret = send(socketfd, packet, strlen(packet), 0);
+    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, ret);
+    log();
     return OK;
 }
 
@@ -187,17 +219,17 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
 
     char packet[PACKET_SIZE] = {0};
     int len = 0;
-    len += snprintf(packet, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "GET / HTTP/1.1\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Accept-Encoding: gzip, deflate, sdch\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Accept-Language: zh-CN,zh;q=0.8\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Host: %s\r\n", buffer);
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Connection: keep-alive\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "Cache-Control: max-age=0\r\n");
-    len += snprintf(packet + len, BUFFER_SIZE > len ? BUFFER_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET / HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate, sdch\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh;q=0.8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s:%d\r\n", address, 80);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: max-age=0\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: msg = %s", __func__, packet);
+    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
     log();
 
     int ret = send(socketfd, packet, strlen(packet), 0);
@@ -222,10 +254,11 @@ Status SocketHelper::recvMessage(char *buffer) {
     FD_ZERO(&rset);
     FD_SET(socketfd, &rset);
     int jump = 0;
-    int ret = -1;
+    int ret = 0;
     int count = -1;
     char data[BUFFER_SIZE];
     bzero(data, sizeof(data));
+    bzero(buffer, sizeof(buffer));
 
     while (jump < 3) {
         ret = select(socketfd + 1, &rset, NULL, NULL, &select_timeout);
@@ -245,13 +278,15 @@ Status SocketHelper::recvMessage(char *buffer) {
         }
         sleep(1);
         jump++;
-        ret = -1;
+        ret = 0;
         bzero(data, sizeof(data));
     }
 
     if (count != -1) {
-        buffer[count] = '\0';
-        snprintf(logMsg, BUFFER_SIZE, "%s: count = %d, msg = %s", __func__, count, buffer);
+        if (count > PACKET_SIZE) {
+            LOGW("%s: receive message overflow !", __func__);
+        }
+        snprintf(logMsg, PACKET_SIZE, "%s: count = %d\r\n%s", __func__, count, buffer);
         log();
     } else {
         return ERROR;

@@ -50,7 +50,7 @@ private:
     SOCKET_ADDR socket_addr;
     struct timeval select_timeout;
     fd_set rset;
-    char logMsg[BUFFER_SIZE];    // log message
+    char logMsg[PACKET_SIZE];    // log message
     bool isTransform;            // if need to transform host to ip
     bool isDebug;                // debug mode
 

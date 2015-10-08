@@ -24,8 +24,10 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
         return;
     }
 
+    jstring msgString = env->NewStringUTF(msg);
     // void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
-    env->CallVoidMethod(obj, method, env->NewStringUTF(msg));
+    env->CallVoidMethod(obj, method, msgString);
+    env->DeleteLocalRef(msgString);
 }
 
 /**
@@ -44,8 +46,10 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
         return;
     }
 
+    jstring msgString = env->NewStringUTF(msg);
     // void (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...);
-    env->CallStaticVoidMethod(cls, method, env->NewStringUTF(msg));
+    env->CallStaticVoidMethod(cls, method, msgString);
+    env->DeleteLocalRef(msgString);
 }
 
 /**
@@ -70,8 +74,10 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
     //  jobject (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
     //  jobject (*AllocObject)(JNIEnv*, jclass);
 
+    jstring msgString = env->NewStringUTF(msg);
     jobject object = env->AllocObject(cls);
-    env->CallVoidMethod(object, method, env->NewStringUTF(msg));
+    env->CallVoidMethod(object, method, msgString);
+    env->DeleteLocalRef(msgString);
 }
 
 #endif //NDKSAMPLE_NOTIFY_CPLUSPLUS_H

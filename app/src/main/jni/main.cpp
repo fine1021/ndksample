@@ -37,7 +37,8 @@ JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_H
     const char *temp = env->GetStringUTFChars(host, NULL);
     socketHelper.createSocket(ConstCharToChar(temp), port);
     socketHelper.connectSocket();
-    socketHelper.sendHttpGetMsg(ConstCharToChar(temp));
+    socketHelper.sendHttpPostMsg(ConstCharToChar(temp));
+    //socketHelper.sendHttpGetMsg(ConstCharToChar(temp));
     //socketHelper.sendMessage(StringToChar("hello"));
     char msg[PACKET_SIZE] = {0};
     socketHelper.recvMessage(msg);
