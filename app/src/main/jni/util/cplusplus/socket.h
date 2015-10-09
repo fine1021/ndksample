@@ -49,7 +49,7 @@ private:
     char address[128];           // IP address
     SOCKET_ADDR socket_addr;
     struct timeval select_timeout;
-    fd_set rset;
+    fd_set rset,wset;
     char logMsg[PACKET_SIZE];    // log message
     bool isTransform;            // if need to transform host to ip
     bool isDebug;                // debug mode

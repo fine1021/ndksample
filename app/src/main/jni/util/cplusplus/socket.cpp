@@ -105,8 +105,6 @@ Status SocketHelper::createSocket(char *host, int port) {
         strncpy(address, host, strlen(host));
     }
 
-    strcpy(address, "101.200.29.44");
-
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd < 0) {
         LOGE("%s: socket create fail !", __func__);
@@ -183,17 +181,18 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
 
     char packet[PACKET_SIZE] = {0};
     char content[BUFFER_SIZE] = {0};
-    int content_len = snprintf(content,BUFFER_SIZE,"username=1078041387@qq.com&password=12122&lt=LT-463067-Pi2kax7H27f23SDa7r5clKONpCC93n&execution=e2s1&_eventId=submit");
+    int content_len = snprintf(content,BUFFER_SIZE,"username=1078041387@qq.com&password=1111111&lt=LT-474072-bpDvuFOMfT4dDqkk0Hu21fzdMbGfcG&execution=e2s1&_eventId=submit");
     int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login?ref=toolbar HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate, sdch\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh;q=0.8\r\n");
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,*/*\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: passport.csdn.net\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Referer: https://passport.csdn.net/account/login?ref=toolbar\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Referer: http://passport.csdn.net/account/login\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: max-age=0\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: no-cache\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "DNT: 1\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
@@ -201,9 +200,31 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
     snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
     log();
 
-    int ret = send(socketfd, packet, strlen(packet), 0);
-    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, ret);
+    /*
+    select_timeout.tv_sec = 10;
+    select_timeout.tv_usec = 0;
+    FD_ZERO(&wset);
+    FD_SET(socketfd, &wset);
+
+    int ret = select(socketfd + 1, &wset, NULL, NULL, &select_timeout);
+    if (ret < 0) {
+        LOGE("%s: socket post failed !", __func__);
+    } else if (ret == 0) {
+        LOGW("%s: socket post timeout !", __func__);
+    } else {
+        snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
+        log();
+        if (FD_ISSET(socketfd, &wset)) {
+            int count = send(socketfd, packet, strlen(packet), 0);
+            snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
+            log();
+        }
+    }*/
+
+    int count = send(socketfd, packet, strlen(packet), 0);
+    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
     log();
+
     return OK;
 }
 
@@ -220,20 +241,41 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
     char packet[PACKET_SIZE] = {0};
     int len = 0;
     len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET / HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate, sdch\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh;q=0.8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip,deflate\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s:%d\r\n", address, 80);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: max-age=0\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: no-cache\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
 
     snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
     log();
 
-    int ret = send(socketfd, packet, strlen(packet), 0);
-    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, ret);
+    /*
+    select_timeout.tv_sec = 10;
+    select_timeout.tv_usec = 0;
+    FD_ZERO(&wset);
+    FD_SET(socketfd, &wset);
+
+    int ret = select(socketfd + 1, &wset, NULL, NULL, &select_timeout);
+    if (ret < 0) {
+        LOGE("%s: socket get failed !", __func__);
+    } else if (ret == 0) {
+        LOGW("%s: socket get timeout !", __func__);
+    } else {
+        snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
+        log();
+        if (FD_ISSET(socketfd, &wset)) {
+            int count = send(socketfd, packet, strlen(packet), 0);
+            snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
+            log();
+        }
+    }*/
+
+    int count = send(socketfd, packet, strlen(packet), 0);
+    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
     log();
 
     return OK;
@@ -249,7 +291,7 @@ Status SocketHelper::recvMessage(char *buffer) {
         return ERROR;
     }
 
-    select_timeout.tv_sec = 5;
+    select_timeout.tv_sec = 10;
     select_timeout.tv_usec = 0;
     FD_ZERO(&rset);
     FD_SET(socketfd, &rset);

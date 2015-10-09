@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //HttpUtil.socketConnect("www.baidu.com", 80);
+                HttpUtil.socketConnect("www.baidu.com", 80);
                 //HttpUtil.socketConnect("sae.sina.com.cn", 80);
-                HttpUtil.socketConnect("passport.csdn.net", 80);
+                //HttpUtil.socketConnect("passport.csdn.net", 80);
                 //HttpUtil.socketConnect("123.125.23.91", 80);
             }
         }).start();
