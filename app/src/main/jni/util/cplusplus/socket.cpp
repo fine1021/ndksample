@@ -179,12 +179,14 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
         return ERROR;
     }
 
+    /*
     char packet[PACKET_SIZE] = {0};
     char content[BUFFER_SIZE] = {0};
     int content_len = snprintf(content,BUFFER_SIZE,"username=1078041387@qq.com&password=1111111&lt=LT-474072-bpDvuFOMfT4dDqkk0Hu21fzdMbGfcG&execution=e2s1&_eventId=submit");
     int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,*/*\r\n");
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login HTTP/1.1\r\n");*/
+    //len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,*/*\r\n");
+    /*
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: passport.csdn.net\r\n");
@@ -198,28 +200,49 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
     snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();
+    log();*/
 
+
+    /**
+     * youdao http post sample
+     */
     /*
-    select_timeout.tv_sec = 10;
-    select_timeout.tv_usec = 0;
-    FD_ZERO(&wset);
-    FD_SET(socketfd, &wset);
+    char packet[PACKET_SIZE] = {0};
+    char content[BUFFER_SIZE] = {0};
+    int content_len = snprintf(content,BUFFER_SIZE,"key=user_plugins&");
+    int len = 0;
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /profile/text/get?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.2; H30-T10 Build/HuaweiH30-T10)\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: dict.youdao.com\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
-    int ret = select(socketfd + 1, &wset, NULL, NULL, &select_timeout);
-    if (ret < 0) {
-        LOGE("%s: socket post failed !", __func__);
-    } else if (ret == 0) {
-        LOGW("%s: socket post timeout !", __func__);
-    } else {
-        snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
-        log();
-        if (FD_ISSET(socketfd, &wset)) {
-            int count = send(socketfd, packet, strlen(packet), 0);
-            snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
-            log();
-        }
-    }*/
+    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
+    log();*/
+
+    /**
+     * china mobile post sample
+     */
+    char packet[PACKET_SIZE] = {0};
+    char content[BUFFER_SIZE] = {0};
+    int content_len = snprintf(content,BUFFER_SIZE,"versionid=2.1.2&session=MDAIEFJRQODLUGVC32UB5QC3&num=13567175635&channelid=1&channel=1");
+    int len = 0;
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /zjweb/MainBillInfo.do HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: android-async-http/1.3.1 (http://loopj.com/android-async-http)\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: app.m.zj.chinamobile.com\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
+
+    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
+    log();
 
     int count = send(socketfd, packet, strlen(packet), 0);
     snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
@@ -238,10 +261,12 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
         return ERROR;
     }
 
+    /*
     char packet[PACKET_SIZE] = {0};
     int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET / HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET / HTTP/1.1\r\n");*/
+    //len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
+    /*
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip,deflate\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s:%d\r\n", address, 80);
@@ -251,28 +276,20 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
 
     snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
+    log();*/
+
+    /**
+     * youdao http get sample
+     */
+    char packet[PACKET_SIZE] = {0};
+    int len = 0;
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET /appapi/userconfig?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com&username=nuaa_yxkang@163.com HTTP/1.1\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: dict.youdao.com\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n\r\n");
+
+    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
     log();
 
-    /*
-    select_timeout.tv_sec = 10;
-    select_timeout.tv_usec = 0;
-    FD_ZERO(&wset);
-    FD_SET(socketfd, &wset);
-
-    int ret = select(socketfd + 1, &wset, NULL, NULL, &select_timeout);
-    if (ret < 0) {
-        LOGE("%s: socket get failed !", __func__);
-    } else if (ret == 0) {
-        LOGW("%s: socket get timeout !", __func__);
-    } else {
-        snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
-        log();
-        if (FD_ISSET(socketfd, &wset)) {
-            int count = send(socketfd, packet, strlen(packet), 0);
-            snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
-            log();
-        }
-    }*/
 
     int count = send(socketfd, packet, strlen(packet), 0);
     snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
@@ -291,18 +308,21 @@ Status SocketHelper::recvMessage(char *buffer) {
         return ERROR;
     }
 
-    select_timeout.tv_sec = 10;
+
+    select_timeout.tv_sec = 5;
     select_timeout.tv_usec = 0;
-    FD_ZERO(&rset);
-    FD_SET(socketfd, &rset);
     int jump = 0;
     int ret = 0;
     int count = -1;
-    char data[BUFFER_SIZE];
-    bzero(data, sizeof(data));
+    int single = 0;
+    char data[RECV_SIZE];
     bzero(buffer, sizeof(buffer));
 
     while (jump < 3) {
+        FD_ZERO(&rset);
+        FD_SET(socketfd, &rset);
+        ret = 0;
+        bzero(data, sizeof(data));
         ret = select(socketfd + 1, &rset, NULL, NULL, &select_timeout);
         if (ret < 0) {
             LOGE("%s: socket receive failed !", __func__);
@@ -314,21 +334,65 @@ Status SocketHelper::recvMessage(char *buffer) {
             snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
             log();
             if (FD_ISSET(socketfd, &rset)) {
-                count += recv(socketfd, data, sizeof(data), 0);
+                single = recv(socketfd, data, sizeof(data), 0);
+                snprintf(logMsg, PACKET_SIZE, "%s", data);
+                log();
+                snprintf(logMsg, BUFFER_SIZE, "single = %d", single);
+                log();
                 strncat(buffer, data, strlen(data));
+                count += single;
             }
         }
         sleep(1);
         jump++;
-        ret = 0;
-        bzero(data, sizeof(data));
+        snprintf(logMsg, PACKET_SIZE, "%s: errno = %d msg = %s", __func__, errno, strerror(errno));
+        log();
     }
+
+    /**
+     * set socket timeout
+     */
+    /*
+    select_timeout.tv_sec = 5;
+    select_timeout.tv_usec = 0;
+    setsockopt(socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&select_timeout, sizeof(struct timeval));
+    setsockopt(socketfd, SOL_SOCKET,SO_RCVTIMEO, (char *)&select_timeout, sizeof(struct timeval));
+    */
+
+    /*
+    int next = 1;
+    int single = 0;
+    int count = 0;
+    char data[BUFFER_SIZE];
+    bzero(data, sizeof(data));
+    bzero(buffer, sizeof(buffer));
+    while(next) {
+        single = recv(socketfd, data, sizeof(data), 0);
+        snprintf(logMsg, PACKET_SIZE, "%s", data);
+        log();
+        snprintf(logMsg, BUFFER_SIZE, "single = %d", single);
+        log();
+        if(single > 0) {
+            next = 1;
+            strncat(buffer, data, single);
+            count += single;
+        } else {
+            next = 0;
+        }
+        if(next == 1) {
+            single = 0;
+            bzero(data, sizeof(data));
+            usleep(500);
+        }
+        snprintf(logMsg, PACKET_SIZE, "%s: errno = %d msg = %s", __func__, errno, strerror(errno));
+        log();
+    }*/
 
     if (count != -1) {
         if (count > PACKET_SIZE) {
             LOGW("%s: receive message overflow !", __func__);
         }
-        snprintf(logMsg, PACKET_SIZE, "%s: count = %d\r\n%s", __func__, count, buffer);
+        snprintf(logMsg, PACKET_SIZE, "%s: count = %d\r\n%s", __func__, strlen(buffer), buffer);
         log();
     } else {
         return ERROR;

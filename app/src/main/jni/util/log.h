@@ -11,6 +11,7 @@
 #define DEBUG 1
 #define LINUX 1
 #define BUFFER_SIZE 1024
+#define RECV_SIZE BUFFER_SIZE * 2
 #define PACKET_SIZE BUFFER_SIZE * 8
 
 #define LOG_TAG "android_native"

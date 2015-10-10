@@ -20,6 +20,7 @@
 #include <string.h>          // bzero
 #include <arpa/inet.h>       // inet_addr htons inet_ntoa inet_aton
 #include <netdb.h>           // hostent
+#include <errno.h>           // errno
 
 #endif
 
@@ -49,7 +50,7 @@ private:
     char address[128];           // IP address
     SOCKET_ADDR socket_addr;
     struct timeval select_timeout;
-    fd_set rset,wset;
+    fd_set rset;
     char logMsg[PACKET_SIZE];    // log message
     bool isTransform;            // if need to transform host to ip
     bool isDebug;                // debug mode
