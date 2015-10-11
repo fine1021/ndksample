@@ -18,16 +18,7 @@ void SocketHelper::init() {
     bzero(logMsg, sizeof(logMsg));
     bzero(address, sizeof(address));
     isTransform = true;
-    isDebug = true;
 }
-
-void SocketHelper::log() {
-    if (isDebug) {
-        LOGI("%s", logMsg);
-    }
-    bzero(logMsg, sizeof(logMsg));
-}
-
 
 void SocketHelper::callJavaMethod() {
     if (env == NULL || obj == NULL) {
@@ -42,6 +33,14 @@ Status SocketHelper::getHostByName(char *host) {
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
+#ifdef WIN32
+    WSADATA wsaData;
+    int err = WSAStartup(MAKEWORD(2, 2), &wsaData);  // load Winsocket DLL
+    if (err != 0) {
+        return ERROR;
+    }
+#endif
+
     struct hostent *hptr;
     char **pptr;
     hptr = gethostbyname(host);
@@ -50,20 +49,17 @@ Status SocketHelper::getHostByName(char *host) {
         return ERROR;
     }
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: official name = %s", __func__, hptr->h_name);
-    log();
+    LOGI("%s: official name = %s", __func__, hptr->h_name);
 
     for (pptr = hptr->h_aliases; *pptr != NULL; pptr++) {
-        snprintf(logMsg, BUFFER_SIZE, "%s: aliases = %s", __func__, *pptr);
-        log();
+        LOGI("%s: aliases = %s", __func__, *pptr);
         switch (hptr->h_addrtype) {
             case AF_INET:
                 pptr = hptr->h_addr_list;
                 for (; *pptr != NULL; pptr++) {
                     char buffer[64];
                     inet_ntop(AF_INET, *pptr, buffer, sizeof(buffer));
-                    snprintf(logMsg, BUFFER_SIZE, "%s: address = %s", __func__, buffer);
-                    log();
+                    LOGI("%s: address = %s", __func__, buffer);
                 }
                 break;
         }
@@ -71,8 +67,7 @@ Status SocketHelper::getHostByName(char *host) {
 
     /* address, for backward compatibility */
     inet_ntop(AF_INET, hptr->h_addr, address, sizeof(address));
-    snprintf(logMsg, BUFFER_SIZE, "%s: IP = %s", __func__, address);
-    log();
+    LOGI("%s: IP = %s", __func__, address);
     return OK;
 }
 
@@ -84,11 +79,6 @@ Status SocketHelper::initEnv(JNIEnv *env1, jobject obj1) {
 
 Status SocketHelper::setTransform(bool value) {
     isTransform = value;
-    return OK;
-}
-
-Status SocketHelper::setDebug(bool value) {
-    isDebug = value;
     return OK;
 }
 
@@ -111,8 +101,7 @@ Status SocketHelper::createSocket(char *host, int port) {
         return ERROR;
     }
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: socketfd = %d", __func__, socketfd);
-    log();
+    LOGI("%s: socketfd = %d", __func__, socketfd);
 
     socket_addr.addr4.sin_family = AF_INET;                 // AF_INET6 for IPV6
     socket_addr.addr4.sin_port = htons(port);               // ntohs(network to host short)
@@ -123,8 +112,7 @@ Status SocketHelper::createSocket(char *host, int port) {
     // LOGI("%s: ip = %s, port = %d", __func__, inet_ntoa(socket_addr.addr4.sin_addr), port);
     char buffer[64];
     inet_ntop(AF_INET, &socket_addr.addr4.sin_addr, buffer, sizeof(buffer));
-    snprintf(logMsg, BUFFER_SIZE, "%s: ip = %s, port = %d", __func__, buffer, port);
-    log();
+    LOGI("%s: ip = %s, port = %d", __func__, buffer, port);
 
     return OK;
 }
@@ -144,8 +132,7 @@ Status SocketHelper::connectSocket() {
         return ERROR;
     }
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: connect OK !", __func__);
-    log();
+    LOGI("%s: connect OK !", __func__);
 
     return OK;
 }
@@ -160,12 +147,9 @@ Status SocketHelper::sendMessage(char *buffer) {
         return ERROR;
     }
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: msg = %s", __func__, buffer);
-    log();
-
+    LOGI("%s: msg = %s", __func__, buffer);
     int ret = send(socketfd, buffer, strlen(buffer), 0);
-    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, ret);
-    log();
+    LOGI("%s: send  = %d", __func__, ret);
 
     return OK;
 }
@@ -199,8 +183,7 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
-    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();*/
+    LOGI("%s: \r\n%s", __func__, packet);*/
 
 
     /**
@@ -221,8 +204,7 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
-    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();*/
+    LOGI("%s: \r\n%s", __func__, packet);*/
 
     /**
      * china mobile post sample
@@ -241,12 +223,10 @@ Status SocketHelper::sendHttpPostMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
-    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();
+    LOGI("%s: \r\n%s", __func__, packet);
 
     int count = send(socketfd, packet, strlen(packet), 0);
-    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
-    log();
+    LOGI("%s: send  = %d", __func__, count);
 
     return OK;
 }
@@ -275,8 +255,7 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: no-cache\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
 
-    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();*/
+    LOGI("%s: \r\n%s", __func__, packet);*/
 
     /**
      * youdao http get sample
@@ -287,13 +266,9 @@ Status SocketHelper::sendHttpGetMsg(char *buffer) {
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: dict.youdao.com\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n\r\n");
 
-    snprintf(logMsg, PACKET_SIZE, "%s: \r\n%s", __func__, packet);
-    log();
-
-
+    LOGI("%s: \r\n%s", __func__, packet);
     int count = send(socketfd, packet, strlen(packet), 0);
-    snprintf(logMsg, BUFFER_SIZE, "%s: send  = %d", __func__, count);
-    log();
+    LOGI("%s: send  = %d", __func__, count);
 
     return OK;
 }
@@ -308,12 +283,14 @@ Status SocketHelper::recvMessage(char *buffer) {
         return ERROR;
     }
 
+    FILE *fp;
+    fp = fopen("/sdcard/socket.txt", "w");
 
-    select_timeout.tv_sec = 5;
+    select_timeout.tv_sec = 3;
     select_timeout.tv_usec = 0;
     int jump = 0;
     int ret = 0;
-    int count = -1;
+    int count = 0;
     int single = 0;
     char data[RECV_SIZE];
     bzero(buffer, sizeof(buffer));
@@ -331,35 +308,34 @@ Status SocketHelper::recvMessage(char *buffer) {
             LOGW("%s: socket receive timeout !", __func__);
             break;
         } else {
-            snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
-            log();
+            LOGI("%s: select ret = %d", __func__, ret);
             if (FD_ISSET(socketfd, &rset)) {
                 single = recv(socketfd, data, sizeof(data), 0);
-                snprintf(logMsg, PACKET_SIZE, "%s", data);
-                log();
-                snprintf(logMsg, BUFFER_SIZE, "single = %d", single);
-                log();
-                strncat(buffer, data, strlen(data));
+                strncat(buffer, data, single);
                 count += single;
             }
         }
-        sleep(1);
+        usleep(500);
         jump++;
-        snprintf(logMsg, PACKET_SIZE, "%s: errno = %d msg = %s", __func__, errno, strerror(errno));
-        log();
     }
 
     /**
      * set socket timeout
      */
     /*
-    select_timeout.tv_sec = 5;
+#ifdef ANDROID
+    select_timeout.tv_sec = 3;
     select_timeout.tv_usec = 0;
-    setsockopt(socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&select_timeout, sizeof(struct timeval));
+    // setsockopt(socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&select_timeout, sizeof(struct timeval));
     setsockopt(socketfd, SOL_SOCKET,SO_RCVTIMEO, (char *)&select_timeout, sizeof(struct timeval));
-    */
+#endif
 
-    /*
+#ifdef WIN32
+	int timeOut = 3000;      // 3 seconds
+	// setsockopt(socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeOut, sizeof(timeOut));
+	setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeOut, sizeof(timeOut));
+#endif
+
     int next = 1;
     int single = 0;
     int count = 0;
@@ -368,10 +344,6 @@ Status SocketHelper::recvMessage(char *buffer) {
     bzero(buffer, sizeof(buffer));
     while(next) {
         single = recv(socketfd, data, sizeof(data), 0);
-        snprintf(logMsg, PACKET_SIZE, "%s", data);
-        log();
-        snprintf(logMsg, BUFFER_SIZE, "single = %d", single);
-        log();
         if(single > 0) {
             next = 1;
             strncat(buffer, data, single);
@@ -384,16 +356,29 @@ Status SocketHelper::recvMessage(char *buffer) {
             bzero(data, sizeof(data));
             usleep(500);
         }
-        snprintf(logMsg, PACKET_SIZE, "%s: errno = %d msg = %s", __func__, errno, strerror(errno));
-        log();
+#ifdef ANDROID
+        printf("%s: errno = %d msg = %s\n", __func__, errno, strerror(errno));
+#endif
     }*/
 
-    if (count != -1) {
+    fputs(buffer, fp);
+    fclose(fp);
+
+    if (count > 0) {
         if (count > PACKET_SIZE) {
             LOGW("%s: receive message overflow !", __func__);
         }
-        snprintf(logMsg, PACKET_SIZE, "%s: count = %d\r\n%s", __func__, strlen(buffer), buffer);
-        log();
+        char *content;
+        if ((content = strstr(buffer, "200 OK")) != NULL) {
+            content = strstr(buffer, "\r\n\r\n");
+            if (content != NULL) {
+                content += 4;
+                bzero(buffer, sizeof(buffer));
+                //strcpy(buffer, content);    // this method will add '\0' automatic
+                bcopy(content, buffer, strlen(content));
+                buffer[strlen(content)] = '\0';
+            }
+        }
     } else {
         return ERROR;
     }
@@ -413,8 +398,11 @@ Status SocketHelper::closeSocket() {
 
     close(socketfd);
 
-    snprintf(logMsg, BUFFER_SIZE, "%s: close socket !", __func__);
-    log();
+#ifdef WIN32
+    WSACleanup();
+#endif
+
+    LOGI("%s: close socket !", __func__);
 
     return OK;
 }

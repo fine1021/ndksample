@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.example.fine.ndksample.ndkInterface.HttpUtil;
 import com.example.fine.ndksample.ndkInterface.Messenger;
 import com.yxkang.android.os.WeakReferenceHandler;
+import com.yxkang.android.util.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //HttpUtil.socketConnect("www.baidu.com", 80);
-                //HttpUtil.socketConnect("dict.youdao.com", 80);
-                HttpUtil.socketConnect("app.m.zj.chinamobile.com", 80);
+                //String msg = HttpUtil.socketConnect("www.baidu.com", 80);
+                //String msg = HttpUtil.socketConnect("dict.youdao.com", 80);
+                String msg = HttpUtil.socketConnect("app.m.zj.chinamobile.com", 80);
                 //HttpUtil.socketConnect("sae.sina.com.cn", 80);
+                Logger.Global.i("android_native", msg);
             }
         }).start();
     }
