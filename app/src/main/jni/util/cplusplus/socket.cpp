@@ -74,16 +74,15 @@ Status SocketHelper::getHostByName(char *host) {
 
     for (pptr = hptr->h_aliases; *pptr != NULL; pptr++) {
         LOGI("%s: aliases = %s", __func__, *pptr);
-        switch (hptr->h_addrtype) {
-            case AF_INET:
-                pptr = hptr->h_addr_list;
-                for (; *pptr != NULL; pptr++) {
-                    char buffer[64];
-                    inet_ntop(AF_INET, *pptr, buffer, sizeof(buffer));
-                    LOGI("%s: address = %s", __func__, buffer);
-                }
-                break;
-        }
+    }
+    switch (hptr->h_addrtype) {
+        case AF_INET:
+            for (pptr = hptr->h_addr_list; *pptr != NULL; pptr++) {
+                char buffer[64];
+                inet_ntop(AF_INET, *pptr, buffer, sizeof(buffer));
+                LOGI("%s: address = %s", __func__, buffer);
+            }
+            break;
     }
 
     /* address, for backward compatibility */

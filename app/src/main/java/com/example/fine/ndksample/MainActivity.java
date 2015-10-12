@@ -71,23 +71,23 @@ public class MainActivity extends AppCompatActivity {
                 switch (type) {
                     case 1:
                         /*content = "hello baidu";
-                        msg = HttpUtil.socketConnect("www.baidu.com", 80, content);*/
+                        msg = HttpUtil.socketConnect("www.baidu.com", content);*/
                         content = "hello sina";
-                        msg = HttpUtil.socketConnect("sae.sina.com.cn", 80, content);
+                        msg = HttpUtil.socketConnect("sae.sina.com.cn", content);
                         break;
                     case 2:
                         /*url = "/appapi/userconfig?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com&username=nuaa_yxkang@163.com";
-                        msg = HttpUtil.socketGetRequest("dict.youdao.com", 80, url);*/
+                        msg = HttpUtil.socketGetRequest("dict.youdao.com", url);*/
                         url = "/public/2.0/bmt/translate?client_id=YourApiKey&q=today%0Atomorrow&from=auto&to=auto";
-                        msg = HttpUtil.socketGetRequest("openapi.baidu.com", 80, url);
+                        msg = HttpUtil.socketGetRequest("openapi.baidu.com", url);
                         break;
                     case 3:
                         url = "/zjweb/MainBillInfo.do";
                         content = "versionid=2.1.2&session=MDAIEFJRQODLUGVC32UB5QC3&num=13567175635&channelid=1&channel=1";
-                        msg = HttpUtil.socketPostRequest("app.m.zj.chinamobile.com", 80, url, content);
+                        msg = HttpUtil.socketPostRequest("app.m.zj.chinamobile.com", url, content);
                         /*url = "/langdetect";
                         content = "query=hello";
-                        msg = HttpUtil.socketPostRequest("fanyi.baidu.com", 80, url, content);*/
+                        msg = HttpUtil.socketPostRequest("fanyi.baidu.com", url, content);*/
                         break;
                 }
                 Logger.Global.i("android_native", msg);

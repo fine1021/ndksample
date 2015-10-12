@@ -7,30 +7,30 @@
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doPostRequest
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest(JNIEnv *env, jclass obj, jstring host, jint port,
-                                                                                              jstring url, jstring content) {
+                                                                                              jstring url, jstring content, jint transform) {
     return string;
 }
 
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doGetRequest
- * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring host, jint port,
-                                                                                             jstring url) {
+                                                                                             jstring url, jint transform) {
     return (*env)->NewStringUTF(env, "Hello from JNI ! ");
 }
 
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doSocketConnect
- * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring host, jint port,
-                                                                                                jstring content) {
+                                                                                                jstring content, jint transform) {
 	LOGD("doSocketConnect!");
 	const char *ip = (*env)->GetStringUTFChars(env, host, NULL);
     notifyMessageObj(env, obj,"initSocket");

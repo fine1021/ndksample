@@ -10,26 +10,26 @@ extern "C" {
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doPostRequest
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest
-  (JNIEnv *, jclass, jstring, jint, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jint, jstring, jstring, jint);
 
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doGetRequest
- * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest
-  (JNIEnv *, jclass, jstring, jint, jstring);
+  (JNIEnv *, jclass, jstring, jint, jstring, jint);
 
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doSocketConnect
- * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect
-  (JNIEnv *, jclass, jstring, jint, jstring);
+  (JNIEnv *, jclass, jstring, jint, jstring, jint);
 
 #ifdef __cplusplus
 }
