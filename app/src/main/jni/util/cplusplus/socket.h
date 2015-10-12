@@ -57,7 +57,8 @@ class SocketHelper {
 
 private:
     int socketfd;
-    char address[128];           // IP address
+    char socketHost[128];            // host
+    char socketIP[128];              // ip of the host
     SOCKET_ADDR socket_addr;
     struct timeval select_timeout;
     fd_set rset;
@@ -74,6 +75,8 @@ private:
 
     Status getHostByName(char *host);
 
+    int formatString(char *str, int flag);
+
 public:
     SocketHelper();
 
@@ -87,13 +90,13 @@ public:
 
     Status connectSocket();
 
-    Status sendMessage(char *buffer);
+    Status sendMessage(char *content);
 
-    Status sendHttpPostMsg(char *buffer);
+    Status sendHttpPostMsg(char *url, char *content);
 
-    Status sendHttpGetMsg(char *buffer);
+    Status sendHttpGetMsg(char *url);
 
-    Status recvMessage(char *buffer);
+    Status recvMessage(char *buffer, int bufferSize);
 
     Status closeSocket();
 };

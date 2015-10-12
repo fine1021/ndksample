@@ -8,41 +8,71 @@
 #include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"
 
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doPostRequest
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest(JNIEnv *env, jclass obj, jstring string, jint i) {
-    return string;
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                              jstring url, jstring content) {
+    LOGD("doPostRequest!");
+    SocketHelper socketHelper;
+    socketHelper.initEnv(env, obj);
+    const char *postHost = env->GetStringUTFChars(host, NULL);
+    socketHelper.createSocket(ConstCharToChar(postHost), port);
+    socketHelper.connectSocket();
+    const char *postUrl = env->GetStringUTFChars(url, NULL);
+    const char *postContent = env->GetStringUTFChars(content, NULL);
+    socketHelper.sendHttpPostMsg(ConstCharToChar(postUrl), ConstCharToChar(postContent));
+    char msg[PACKET_SIZE] = {0};
+    socketHelper.recvMessage(msg, PACKET_SIZE);
+    socketHelper.closeSocket();
+    env->ReleaseStringUTFChars(host, postHost);
+    env->ReleaseStringUTFChars(url, postUrl);
+    env->ReleaseStringUTFChars(content, postContent);
+    return env->NewStringUTF(msg);
 }
-
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doGetRequest
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring string, jint i) {
-    return env->NewStringUTF("Hello from JNI ! ");
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                             jstring url) {
+    LOGD("doGetRequest!");
+    SocketHelper socketHelper;
+    socketHelper.initEnv(env,obj);
+    const char *getHost = env->GetStringUTFChars(host, NULL);
+    socketHelper.createSocket(ConstCharToChar(getHost), port);
+    socketHelper.connectSocket();
+    const char *getUrl = env->GetStringUTFChars(url, NULL);
+    socketHelper.sendHttpGetMsg(ConstCharToChar(getUrl));
+    char msg[PACKET_SIZE] = {0};
+    socketHelper.recvMessage(msg, PACKET_SIZE);
+    socketHelper.closeSocket();
+    env->ReleaseStringUTFChars(host, getHost);
+    env->ReleaseStringUTFChars(url, getUrl);
+    return env->NewStringUTF(msg);
 }
 
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doSocketConnect
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring host, jint port) {
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                                jstring content) {
     LOGD("doSocketConnect!");
     SocketHelper socketHelper;
     socketHelper.initEnv(env,obj);
-    const char *temp = env->GetStringUTFChars(host, NULL);
-    socketHelper.createSocket(ConstCharToChar(temp), port);
+    const char *sendHost = env->GetStringUTFChars(host, NULL);
+    socketHelper.createSocket(ConstCharToChar(sendHost), port);
     socketHelper.connectSocket();
-    socketHelper.sendHttpPostMsg(ConstCharToChar(temp));
-    //socketHelper.sendHttpGetMsg(ConstCharToChar(temp));
-    //socketHelper.sendMessage(StringToChar("hello"));
+    const char *sendContent = env->GetStringUTFChars(content, NULL);
+    socketHelper.sendMessage(ConstCharToChar(sendContent));
     char msg[PACKET_SIZE] = {0};
-    socketHelper.recvMessage(msg);
+    socketHelper.recvMessage(msg, PACKET_SIZE);
     socketHelper.closeSocket();
-    env->ReleaseStringUTFChars(host, temp);
+    env->ReleaseStringUTFChars(host, sendHost);
+    env->ReleaseStringUTFChars(content, sendContent);
     return env->NewStringUTF(msg);
 }

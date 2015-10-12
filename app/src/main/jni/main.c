@@ -5,31 +5,34 @@
 
 
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doPostRequest
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest(JNIEnv *env, jclass obj, jstring string, jint i) {
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doPostRequest(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                              jstring url, jstring content) {
     return string;
 }
 
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doGetRequest
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring string, jint i) {
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doGetRequest(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                             jstring url) {
     return (*env)->NewStringUTF(env, "Hello from JNI ! ");
 }
 
 /*
- * Class:     com_yxkang_jnisocket_HttpUtil
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
  * Method:    doSocketConnect
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring string, jint i) {
+JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JNIEnv *env, jclass obj, jstring host, jint port,
+                                                                                                jstring content) {
 	LOGD("doSocketConnect!");
-	const char *ip = (*env)->GetStringUTFChars(env, string, NULL);
+	const char *ip = (*env)->GetStringUTFChars(env, host, NULL);
     notifyMessageObj(env, obj,"initSocket");
     initSocket(ConstCharToChar(ip), i);
     notifyMessageObj(env, obj, "connectSocket");
@@ -41,6 +44,6 @@ JNIEXPORT jstring JNICALL JNICALL Java_com_example_fine_ndksample_ndkInterface_H
 	recvMessage(msg);
     notifyMessageObj(env, obj,"closeSocket");
     closeSocket();
-    (*env)->ReleaseStringUTFChars(env, string, ip);
-    return string;
+    (*env)->ReleaseStringUTFChars(env, host, ip);
+    return (*env)->NewStringUTF(env, msg);
 }

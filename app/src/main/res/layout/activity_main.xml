@@ -17,13 +17,45 @@
         android:textSize="16sp" />
 
     <Button
-        android:id="@+id/socketButton"
+        android:id="@+id/socketButton1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
-        android:text="@string/socketButton"
+        android:text="@string/socketButton1"
         android:textAllCaps="false"
         android:textSize="16sp"
         tools:ignore="UnusedAttribute" />
+
+    <Button
+        android:id="@+id/socketButton2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/socketButton1"
+        android:text="@string/socketButton2"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        tools:ignore="UnusedAttribute" />
+
+    <Button
+        android:id="@+id/socketButton3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/socketButton2"
+        android:text="@string/socketButton3"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        tools:ignore="UnusedAttribute" />
+
+    <ScrollView
+        android:layout_below="@+id/socketButton3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/console"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
 
 </RelativeLayout>

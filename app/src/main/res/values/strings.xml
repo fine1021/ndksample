@@ -3,5 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="socketButton">SocketButton</string>
+    <string name="socketButton1">SocketSend</string>
+    <string name="socketButton2">SocketGet</string>
+    <string name="socketButton3">SocketPost</string>
+
 </resources>

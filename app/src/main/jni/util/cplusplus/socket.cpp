@@ -16,7 +16,8 @@ void SocketHelper::init() {
     socketfd = -1;
     bzero(&socket_addr, sizeof(socket_addr));
     bzero(logMsg, sizeof(logMsg));
-    bzero(address, sizeof(address));
+    bzero(socketHost, sizeof(socketHost));
+    bzero(socketIP, sizeof(socketIP));
     isTransform = true;
 }
 
@@ -26,6 +27,26 @@ void SocketHelper::callJavaMethod() {
     }
     notifyMessageObj(env, obj, logMsg);
     bzero(logMsg, sizeof(logMsg));
+}
+
+int SocketHelper::formatString(char *str, int flag) {
+    int offset = 0;
+    if(flag == 1) {                       // application/json
+        while(str[offset] != '{') {
+            offset++;
+        }
+        int len = strlen(str);
+        int i = len - 1;
+        for(;i > 0;i--) {
+            if(str[i] != '}') {
+                str[i] = '\0';
+            } else {
+                break;
+            }
+        }
+    }
+    LOGI("%s: offset = %d", __func__, offset);
+    return offset;
 }
 
 Status SocketHelper::getHostByName(char *host) {
@@ -66,8 +87,8 @@ Status SocketHelper::getHostByName(char *host) {
     }
 
     /* address, for backward compatibility */
-    inet_ntop(AF_INET, hptr->h_addr, address, sizeof(address));
-    LOGI("%s: IP = %s", __func__, address);
+    inet_ntop(AF_INET, hptr->h_addr, socketIP, sizeof(socketIP));
+    // LOGI("%s: IP = %s", __func__, socketIP);
     return OK;
 }
 
@@ -87,13 +108,21 @@ Status SocketHelper::createSocket(char *host, int port) {
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
+    if(strlen(host) >= sizeof(socketHost)){
+        LOGE("%s: socket host is too long !", __func__);
+        return ERROR;
+    }
+
+    strncpy(socketHost, host, strlen(host));
     if (isTransform) {
         if (getHostByName(host) == ERROR) {
             return ERROR;
         }
     } else {
-        strncpy(address, host, strlen(host));
+        strncpy(socketIP, host, strlen(host));
     }
+
+    LOGI("%s: socketHost = %s", __func__, socketHost);
 
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd < 0) {
@@ -105,14 +134,14 @@ Status SocketHelper::createSocket(char *host, int port) {
 
     socket_addr.addr4.sin_family = AF_INET;                 // AF_INET6 for IPV6
     socket_addr.addr4.sin_port = htons(port);               // ntohs(network to host short)
-    // socket_addr.addr4.sin_addr.s_addr = inet_addr(address);   // in_addr_t
-    // inet_aton(address, &socket_addr.addr4.sin_addr);
-    inet_pton(AF_INET, address, &socket_addr.addr4.sin_addr);
+    // socket_addr.addr4.sin_addr.s_addr = inet_addr(socketIP);   // in_addr_t
+    // inet_aton(socketIP, &socket_addr.addr4.sin_addr);
+    inet_pton(AF_INET, socketIP, &socket_addr.addr4.sin_addr);
 
     // LOGI("%s: ip = %s, port = %d", __func__, inet_ntoa(socket_addr.addr4.sin_addr), port);
     char buffer[64];
     inet_ntop(AF_INET, &socket_addr.addr4.sin_addr, buffer, sizeof(buffer));
-    LOGI("%s: ip = %s, port = %d", __func__, buffer, port);
+    LOGI("%s: socketIP = %s, socketPort = %d", __func__, buffer, port);
 
     return OK;
 }
@@ -123,7 +152,7 @@ Status SocketHelper::connectSocket() {
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
@@ -132,154 +161,110 @@ Status SocketHelper::connectSocket() {
         return ERROR;
     }
 
-    LOGI("%s: connect OK !", __func__);
+    LOGI("%s: socket connect ok !", __func__);
 
     return OK;
 }
 
-Status SocketHelper::sendMessage(char *buffer) {
+Status SocketHelper::sendMessage(char *content) {
 
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
-    LOGI("%s: msg = %s", __func__, buffer);
-    int ret = send(socketfd, buffer, strlen(buffer), 0);
-    LOGI("%s: send  = %d", __func__, ret);
+    // LOGI("%s: \r\n%s", __func__, content);
+
+    int count = send(socketfd, content, strlen(content), 0);
+    if(count == strlen(content)) {
+        LOGI("%s: socket send  ok !", __func__);
+    } else {
+        LOGE("%s: socket send  fail !", __func__);
+    }
 
     return OK;
 }
 
-Status SocketHelper::sendHttpPostMsg(char *buffer) {
+Status SocketHelper::sendHttpPostMsg(char *url, char *content) {
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
-    /*
-    char packet[PACKET_SIZE] = {0};
-    char content[BUFFER_SIZE] = {0};
-    int content_len = snprintf(content,BUFFER_SIZE,"username=1078041387@qq.com&password=1111111&lt=LT-474072-bpDvuFOMfT4dDqkk0Hu21fzdMbGfcG&execution=e2s1&_eventId=submit");
     int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /account/login HTTP/1.1\r\n");*/
-    //len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: text/html,application/xhtml+xml,*/*\r\n");
-    /*
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip, deflate\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: passport.csdn.net\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Referer: http://passport.csdn.net/account/login\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
+    int content_len = strlen(content);
+    char packet[PACKET_SIZE] = {0};
+
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST %s HTTP/1.1\r\n", url);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded;charset=utf-8\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: android-socket-http\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s\r\n", socketHost);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
+    //len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip\r\n");   // tell server the client encoding format. if removed, server will return text directly
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: no-cache\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "DNT: 1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
-
-    LOGI("%s: \r\n%s", __func__, packet);*/
-
-
-    /**
-     * youdao http post sample
-     */
-    /*
-    char packet[PACKET_SIZE] = {0};
-    char content[BUFFER_SIZE] = {0};
-    int content_len = snprintf(content,BUFFER_SIZE,"key=user_plugins&");
-    int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /profile/text/get?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Dalvik/1.6.0 (Linux; U; Android 4.4.2; H30-T10 Build/HuaweiH30-T10)\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: dict.youdao.com\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
 
-    LOGI("%s: \r\n%s", __func__, packet);*/
+    // LOGI("%s: \r\n%s", __func__, packet);
 
-    /**
-     * china mobile post sample
-     */
-    char packet[PACKET_SIZE] = {0};
-    char content[BUFFER_SIZE] = {0};
-    int content_len = snprintf(content,BUFFER_SIZE,"versionid=2.1.2&session=MDAIEFJRQODLUGVC32UB5QC3&num=13567175635&channelid=1&channel=1");
-    int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "POST /zjweb/MainBillInfo.do HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: android-async-http/1.3.1 (http://loopj.com/android-async-http)\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: app.m.zj.chinamobile.com\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Length: %d\r\n\r\n", content_len);
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "%s", content);
+    int count = send(socketfd, packet, len, 0);
 
-    LOGI("%s: \r\n%s", __func__, packet);
-
-    int count = send(socketfd, packet, strlen(packet), 0);
-    LOGI("%s: send  = %d", __func__, count);
+    if(count == len) {
+        LOGI("%s: socket send  ok !", __func__);
+    } else {
+        LOGE("%s: socket send  fail !", __func__);
+    }
 
     return OK;
 }
 
-Status SocketHelper::sendHttpGetMsg(char *buffer) {
+Status SocketHelper::sendHttpGetMsg(char *url) {
 
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
-    /*
-    char packet[PACKET_SIZE] = {0};
     int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET / HTTP/1.1\r\n");*/
-    //len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
-    /*
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Encoding: gzip,deflate\r\n");
+    char packet[PACKET_SIZE] = {0};
+
+    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET %s HTTP/1.1\r\n", url);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s\r\n", socketHost);
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept: */*\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Accept-Language: zh-CN,zh\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: %s:%d\r\n", address, 80);
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Content-Type: application/x-www-form-urlencoded\r\n");
     len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Cache-Control: no-cache\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64)\r\n\r\n");
+    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: keep-alive\r\n\r\n");
 
-    LOGI("%s: \r\n%s", __func__, packet);*/
+    // LOGI("%s: \r\n%s", __func__, packet);
 
-    /**
-     * youdao http get sample
-     */
-    char packet[PACKET_SIZE] = {0};
-    int len = 0;
-    len += snprintf(packet, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "GET /appapi/userconfig?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com&username=nuaa_yxkang@163.com HTTP/1.1\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Host: dict.youdao.com\r\n");
-    len += snprintf(packet + len, PACKET_SIZE > len ? PACKET_SIZE - len : 0, "Connection: Keep-Alive\r\n\r\n");
+    int count = send(socketfd, packet, len, 0);
 
-    LOGI("%s: \r\n%s", __func__, packet);
-    int count = send(socketfd, packet, strlen(packet), 0);
-    LOGI("%s: send  = %d", __func__, count);
+    if(count == len) {
+        LOGI("%s: socket send  ok !", __func__);
+    } else {
+        LOGE("%s: socket send  fail !", __func__);
+    }
 
     return OK;
 }
 
-Status SocketHelper::recvMessage(char *buffer) {
+Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
 
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
@@ -293,7 +278,7 @@ Status SocketHelper::recvMessage(char *buffer) {
     int count = 0;
     int single = 0;
     char data[RECV_SIZE];
-    bzero(buffer, sizeof(buffer));
+    bzero(buffer, bufferSize);
 
     while (jump < 3) {
         FD_ZERO(&rset);
@@ -339,9 +324,9 @@ Status SocketHelper::recvMessage(char *buffer) {
     int next = 1;
     int single = 0;
     int count = 0;
-    char data[BUFFER_SIZE];
+    char data[RECV_SIZE];
     bzero(data, sizeof(data));
-    bzero(buffer, sizeof(buffer));
+    bzero(buffer, bufferSize);
     while(next) {
         single = recv(socketfd, data, sizeof(data), 0);
         if(single > 0) {
@@ -364,20 +349,47 @@ Status SocketHelper::recvMessage(char *buffer) {
     fputs(buffer, fp);
     fclose(fp);
 
+    // LOGD("%s: \n%s", __func__, buffer);
+
     if (count > 0) {
         if (count > PACKET_SIZE) {
             LOGW("%s: receive message overflow !", __func__);
         }
-        char *content;
-        if ((content = strstr(buffer, "200 OK")) != NULL) {
-            content = strstr(buffer, "\r\n\r\n");
-            if (content != NULL) {
-                content += 4;
-                bzero(buffer, sizeof(buffer));
-                //strcpy(buffer, content);    // this method will add '\0' automatic
-                bcopy(content, buffer, strlen(content));
-                buffer[strlen(content)] = '\0';
+        char *p;
+        if((p = strstr(buffer, "HTTP/1.1")) != NULL) {
+            char code[3];
+            strncpy(code, p + 9, 3);
+            LOGD("responseCode : %d", atoi(code));
+        } else {
+            LOGD("%s: \n%s", __func__, buffer);
+            bzero(buffer, bufferSize);            // clear buffer, since the message is invalid
+            return ERROR;
+        }
+        if (strstr(buffer, "HTTP/1.1 200 OK") != NULL) {
+            int flag = 0;
+            if((p = strstr(buffer, "Content-Type: application/json")) != NULL) {
+                flag = 1;
             }
+            char *content;
+            if ((p = strstr(buffer, "\r\n\r\n")) != NULL) {
+                p += 4;                        // skip "\r\n\r\n"
+                int len = strlen(p) + 1;
+                content = (char *)malloc(len * sizeof(char));
+                if(content == NULL) {
+                    LOGE("%s: content == NULL !", __func__);
+                    return ERROR;
+                }
+                strcpy(content, p);                        // copy to content
+                int offset = formatString(content, flag);
+                bzero(buffer, bufferSize);                 // clear buffer
+                strcpy(buffer, content + offset);          // copy the content to buffer
+                //bcopy(content + offset, buffer, strlen(content));
+                buffer[strlen(content) - offset] = '\0';
+                free(content);                             // free content
+            }
+        } else {
+            bzero(buffer, bufferSize);              // clear buffer, since the message is invalid
+            return ERROR;
         }
     } else {
         return ERROR;
@@ -392,7 +404,7 @@ Status SocketHelper::closeSocket() {
     callJavaMethod();
 
     if (socketfd < 0) {
-        LOGE("%s: socket has't init !", __func__);
+        LOGE("%s: socket is not initialized !", __func__);
         return ERROR;
     }
 
