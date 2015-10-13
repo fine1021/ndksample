@@ -18,14 +18,14 @@ void SocketHelper::init() {
     bzero(logMsg, sizeof(logMsg));
     bzero(socketHost, sizeof(socketHost));
     bzero(socketIP, sizeof(socketIP));
-    isTransform = true;
+    isConvert = true;
 }
 
 void SocketHelper::callJavaMethod() {
-    if (env == NULL || obj == NULL) {
+    if (env == NULL) {
         return;
     }
-    notifyMessageObj(env, obj, logMsg);
+    notifyMessageObj(env, logMsg);
     bzero(logMsg, sizeof(logMsg));
 }
 
@@ -80,7 +80,7 @@ Status SocketHelper::getHostByName(char *host) {
             for (pptr = hptr->h_addr_list; *pptr != NULL; pptr++) {
                 char buffer[64];
                 inet_ntop(AF_INET, *pptr, buffer, sizeof(buffer));
-                LOGI("%s: address = %s", __func__, buffer);
+                LOGI("%s: IPv4 address = %s", __func__, buffer);
             }
             break;
     }
@@ -91,14 +91,13 @@ Status SocketHelper::getHostByName(char *host) {
     return OK;
 }
 
-Status SocketHelper::initEnv(JNIEnv *env1, jobject obj1) {
+Status SocketHelper::initEnv(JNIEnv *env1) {
     env = env1;
-    obj = obj1;
     return OK;
 };
 
-Status SocketHelper::setTransform(bool value) {
-    isTransform = value;
+Status SocketHelper::setConvert(bool value) {
+    isConvert = value;
     return OK;
 }
 
@@ -113,7 +112,7 @@ Status SocketHelper::createSocket(char *host, int port) {
     }
 
     strncpy(socketHost, host, strlen(host));
-    if (isTransform) {
+    if (isConvert) {
         if (getHostByName(host) == ERROR) {
             return ERROR;
         }

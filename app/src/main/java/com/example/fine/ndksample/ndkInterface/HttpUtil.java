@@ -5,26 +5,34 @@ package com.example.fine.ndksample.ndkInterface;
  */
 public class HttpUtil {
 
-    private static native String doPostRequest(String host, int port, String url, String content, int transform);
+    private static final int FLAG_BASE = 1;
 
-    private static native String doGetRequest(String host, int port, String url, int transform);
+    public static final int PORT = 80;
 
-    private static native String doSocketConnect(String host, int port, String content, int transform);
+    public static final int FLAG_CONVERT = FLAG_BASE;                  // convert domain name to ip
+
+    public static final int FLAG_NOT_CONVERT = FLAG_BASE << 1;         // not convert
+
+    private static native String doPostRequest(String host, int port, String url, String content, int flag);
+
+    private static native String doGetRequest(String host, int port, String url, int flag);
+
+    private static native String doSocketConnect(String host, int port, String content, int flag);
 
     static {
         System.loadLibrary("socket");
     }
 
     public static String socketConnect(String host, String content) {
-        return doSocketConnect(host, 80, content, 1);
+        return doSocketConnect(host, PORT, content, FLAG_CONVERT);
     }
 
     public static String socketGetRequest(String host, String url) {
-        return doGetRequest(host, 80, url, 1);
+        return doGetRequest(host, PORT, url, FLAG_CONVERT);
     }
 
     public static String socketPostRequest(String host, String url, String content) {
-        return doPostRequest(host, 80, url, content, 1);
+        return doPostRequest(host, PORT, url, content, FLAG_CONVERT);
     }
 
 }

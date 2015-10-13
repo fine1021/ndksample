@@ -11,14 +11,14 @@
  * javap -s xx.class query parameter type
  */
 void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
-    jclass cls = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
-    if (cls == 0) {
+    jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
+    if (clazz == 0) {
         LOGE("find class error");
         return;
     }
 
     // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
-    jmethodID method = env->GetMethodID(cls, "notifyMessage", "(Ljava/lang/String;)V");
+    jmethodID method = env->GetMethodID(clazz, "notifyMessage", "(Ljava/lang/String;)V");
     if (method == 0) {
         LOGE("find method error");
         return;
@@ -33,14 +33,14 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
 /**
  * call java class static method
  */
-void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
-    jclass cls = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
-    if (cls == 0) {
+void notifyMessageStatic(JNIEnv *env, char *msg) {
+    jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
+    if (clazz == 0) {
         LOGE("find class error");
         return;
     }
     // jmethodID (*GetStaticMethodID)(JNIEnv*, jclass, const char*, const char*);
-    jmethodID method = env->GetStaticMethodID(cls, "notifyMessage", "(Ljava/lang/String;)V");
+    jmethodID method = env->GetStaticMethodID(clazz, "notifyMessage", "(Ljava/lang/String;)V");
     if (method == 0) {
         LOGE("find method error");
         return;
@@ -48,7 +48,7 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
 
     jstring msgString = env->NewStringUTF(msg);
     // void (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...);
-    env->CallStaticVoidMethod(cls, method, msgString);
+    env->CallStaticVoidMethod(clazz, method, msgString);
     env->DeleteLocalRef(msgString);
 }
 
@@ -56,15 +56,15 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
  * call java class method
  * the java class which calls jni native methods, is not the class which has callbacks
  */
-void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
-    jclass cls = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
-    if (cls == 0) {
+void notifyMessageObj(JNIEnv *env, const char *msg) {
+    jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
+    if (clazz == 0) {
         LOGE("find class error");
         return;
     }
 
     // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
-    jmethodID method = env->GetMethodID(cls, "notifyMessage", "(Ljava/lang/String;)V");
+    jmethodID method = env->GetMethodID(clazz, "notifyMessage", "(Ljava/lang/String;)V");
     if (method == 0) {
         LOGE("find method error");
         return;
@@ -75,8 +75,8 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
     //  jobject (*AllocObject)(JNIEnv*, jclass);
 
     jstring msgString = env->NewStringUTF(msg);
-    jobject object = env->AllocObject(cls);
-    env->CallVoidMethod(object, method, msgString);
+    jobject obj = env->AllocObject(clazz);
+    env->CallVoidMethod(obj, method, msgString);
     env->DeleteLocalRef(msgString);
 }
 

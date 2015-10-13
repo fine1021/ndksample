@@ -57,17 +57,14 @@ class SocketHelper {
 
 private:
     int socketfd;
-    char socketHost[128];            // host
-    char socketIP[128];              // ip of the host
+    char socketHost[128];            // domain name
+    char socketIP[128];              // ip of the domain name
     SOCKET_ADDR socket_addr;
     struct timeval select_timeout;
     fd_set rset;
-    char logMsg[PACKET_SIZE];    // log message
-    bool isTransform;            // if need to transform host to ip
-
-    /* ADD : jni call java method */
-    JNIEnv *env;
-    jobject obj;
+    char logMsg[PACKET_SIZE];        // log message
+    bool isConvert;                  // if need to convert domain name to ip
+    JNIEnv *env;                     // jni call java method
 
     void init();
 
@@ -82,9 +79,9 @@ public:
 
     ~SocketHelper();
 
-    Status initEnv(JNIEnv *env, jobject obj);
+    Status initEnv(JNIEnv *env);
 
-    Status setTransform(bool value);
+    Status setConvert(bool value);
 
     Status createSocket(char *host, int port);
 
