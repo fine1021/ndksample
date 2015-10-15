@@ -7,6 +7,8 @@
 
 #include <jni.h>
 #include <android/log.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define ANDROID 1
 #define BUFFER_SIZE 1024

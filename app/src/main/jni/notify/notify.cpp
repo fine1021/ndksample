@@ -1,17 +1,17 @@
 //
-// Created by yexiaokang on 2015/9/29.
+// Created by yexiaokang on 2015/10/15.
 //
 
-#ifndef NDKSAMPLE_NOTIFY_CPLUSPLUS_H
-#define NDKSAMPLE_NOTIFY_CPLUSPLUS_H
+#include "notify.h"
 
 /**
  * call java class method
  * jni String Type : java/lang/String  or  Ljava/lang/String;
  * javap -s xx.class query parameter type
  */
-void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
-    jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
+void notifyMessageWithObj(JNIEnv *env, jobject obj, const char *msg) {
+
+    jclass clazz = env->GetObjectClass(obj);
     if (clazz == 0) {
         LOGE("find class error");
         return;
@@ -34,6 +34,7 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
  * call java class static method
  */
 void notifyMessageStatic(JNIEnv *env, char *msg) {
+
     jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
     if (clazz == 0) {
         LOGE("find class error");
@@ -56,7 +57,8 @@ void notifyMessageStatic(JNIEnv *env, char *msg) {
  * call java class method
  * the java class which calls jni native methods, is not the class which has callbacks
  */
-void notifyMessageObj(JNIEnv *env, const char *msg) {
+void notifyMessage(JNIEnv *env, const char *msg) {
+
     jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
     if (clazz == 0) {
         LOGE("find class error");
@@ -80,4 +82,50 @@ void notifyMessageObj(JNIEnv *env, const char *msg) {
     env->DeleteLocalRef(msgString);
 }
 
-#endif //NDKSAMPLE_NOTIFY_CPLUSPLUS_H
+void initJavaVM(JavaVM *vm) {
+    jvm = vm;
+}
+
+int callJavaMethod(char *msg) {
+    if (jvm != NULL) {
+        JNIEnv *env = NULL;
+        if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+            LOGE("GetEnv Failed !");
+            return JNI_ERR;
+        }
+        notifyMessage(env, msg);
+    }
+}
+
+int callJavaMethodStatic(char *msg) {
+    if (jvm != NULL) {
+        JNIEnv *env = NULL;
+        if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+            LOGE("GetEnv Failed !");
+            return JNI_ERR;
+        }
+        notifyMessageStatic(env, msg);
+    }
+}
+
+int callJavaMethodWithObj(jobject obj, char *msg) {
+    if (jvm != NULL) {
+        JNIEnv *env = NULL;
+        if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+            LOGE("GetEnv Failed !");
+            return JNI_ERR;
+        }
+        notifyMessageWithObj(env, obj, msg);
+    }
+}
+
+JavaMethodInterface javaMethodInterface = {
+        initJavaVM,
+        callJavaMethod,
+        callJavaMethodStatic,
+        callJavaMethodWithObj
+};
+
+JavaMethodInterface *getJavaMethodInterface() {
+    return &javaMethodInterface;
+}

@@ -5,20 +5,19 @@
 #define CPP_COMPILE
 
 #include "util/char.h"
-#include "util/cplusplus/socket.cpp"
+#include "socket/socket.cpp"
 
 #define NELEM(x)  (sizeof(x) / sizeof((x)[0]))
 
-
-static const char *classPath = "com/example/fine/ndksample/ndkInterface/HttpUtil";
+JavaVM *javaVM;
+const char *classPath = "com/example/fine/ndksample/ndkInterface/HttpUtil";
 
 /**
  * java class static method use jclass, none-static method use jobject
  */
-static jstring doPostRequest(JNIEnv *env, jclass clazz, jstring host, jint port, jstring url, jstring content, jint flag) {
+jstring doPostRequest(JNIEnv *env, jclass clazz, jstring host, jint port, jstring url, jstring content, jint flag) {
     LOGD("doPostRequest!");
     SocketHelper socketHelper;
-    socketHelper.initEnv(env);
     socketHelper.setConvert(flag & FLAG_CONVERT);
     const char *postHost = env->GetStringUTFChars(host, NULL);
     socketHelper.createSocket(ConstCharToChar(postHost), port);
@@ -38,10 +37,9 @@ static jstring doPostRequest(JNIEnv *env, jclass clazz, jstring host, jint port,
 /**
  * java class static method use jclass, none-static method use jobject
  */
-static jstring doGetRequest(JNIEnv *env, jclass clazz, jstring host, jint port, jstring url, jint flag) {
+jstring doGetRequest(JNIEnv *env, jclass clazz, jstring host, jint port, jstring url, jint flag) {
     LOGD("doGetRequest!");
     SocketHelper socketHelper;
-    socketHelper.initEnv(env);
     socketHelper.setConvert(flag & FLAG_CONVERT);
     const char *getHost = env->GetStringUTFChars(host, NULL);
     socketHelper.createSocket(ConstCharToChar(getHost), port);
@@ -59,10 +57,9 @@ static jstring doGetRequest(JNIEnv *env, jclass clazz, jstring host, jint port, 
 /**
  * java class static method use jclass, none-static method use jobject
  */
-static jstring doSocketConnect(JNIEnv *env, jclass clazz, jstring host, jint port, jstring content, jint flag) {
+jstring doSocketConnect(JNIEnv *env, jclass clazz, jstring host, jint port, jstring content, jint flag) {
     LOGD("doSocketConnect!");
     SocketHelper socketHelper;
-    socketHelper.initEnv(env);
     socketHelper.setConvert(flag & FLAG_CONVERT);
     const char *sendHost = env->GetStringUTFChars(host, NULL);
     socketHelper.createSocket(ConstCharToChar(sendHost), port);
@@ -77,13 +74,14 @@ static jstring doSocketConnect(JNIEnv *env, jclass clazz, jstring host, jint por
     return env->NewStringUTF(msg);
 }
 
-static JNINativeMethod methods[] = {
+JNINativeMethod methods[] = {
         {"doPostRequest",   "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)Ljava/lang/String;", (void *) doPostRequest},
         {"doGetRequest",    "(Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;",                   (void *) doGetRequest},
         {"doSocketConnect", "(Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;",                   (void *) doSocketConnect}
 };
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    javaVM = vm;
     JNIEnv *env = NULL;
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
         LOGE("GetEnv Failed !");

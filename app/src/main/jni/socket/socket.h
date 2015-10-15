@@ -10,10 +10,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #endif
 
-#include "../log.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "notify.h"
+#include "../notify/interface.h"
 
 #ifdef ANDROID
 
@@ -26,6 +23,7 @@
 #include <arpa/inet.h>       // inet_addr htons inet_ntoa inet_aton
 #include <netdb.h>           // hostent
 #include <errno.h>           // errno
+#include <dlfcn.h>           // load so library
 
 #endif
 
@@ -41,6 +39,8 @@
 #define close(fd) closesocket(fd)                     // linux C close
 #define usleep(dwMilliseconds) Sleep(dwMilliseconds)  // linux C usleep
 #endif
+
+extern JavaVM *javaVM;              // define global variable
 
 #define OK 1
 #define ERROR 0
@@ -64,9 +64,11 @@ private:
     fd_set rset;
     char logMsg[PACKET_SIZE];        // log message
     bool isConvert;                  // if need to convert domain name to ip
-    JNIEnv *env;                     // jni call java method
+    JavaMethodInterface *javaMethodInterface;
 
     void init();
+
+    void loadJavaMethod();
 
     void callJavaMethod();
 
@@ -78,8 +80,6 @@ public:
     SocketHelper();
 
     ~SocketHelper();
-
-    Status initEnv(JNIEnv *env);
 
     Status setConvert(bool value);
 

@@ -6,6 +6,7 @@
 
 SocketHelper::SocketHelper() {
     init();
+    loadJavaMethod();
 }
 
 SocketHelper::~SocketHelper() {
@@ -21,24 +22,45 @@ void SocketHelper::init() {
     isConvert = true;
 }
 
-void SocketHelper::callJavaMethod() {
-    if (env == NULL) {
+void SocketHelper::loadJavaMethod() {
+
+    void *libm_handle = NULL;
+    JavaMethodInterface *(*getInterface)(void);
+
+    libm_handle = dlopen("libnotify.so", RTLD_NOW);
+    if (libm_handle == NULL) {
+        LOGE("%s: dlopen failed: %s", __func__, dlerror());
         return;
     }
-    notifyMessageObj(env, logMsg);
+    getInterface = (JavaMethodInterface *(*)(void)) dlsym(libm_handle, "getJavaMethodInterface");
+    if (getInterface == NULL) {
+        LOGE("%s: dlsym failed: %s", __func__, dlerror());
+        dlclose(libm_handle);
+        return;
+    }
+    javaMethodInterface = getInterface();
+    javaMethodInterface->initJavaVM(javaVM);
+}
+
+void SocketHelper::callJavaMethod() {
+    if (javaMethodInterface == NULL) {
+        bzero(logMsg, sizeof(logMsg));
+        return;
+    }
+    javaMethodInterface->notifyMessage(logMsg);
     bzero(logMsg, sizeof(logMsg));
 }
 
 int SocketHelper::formatString(char *str, int flag) {
     int offset = 0;
-    if(flag == 1) {                       // application/json
-        while(str[offset] != '{') {
+    if (flag == 1) {                       // application/json
+        while (str[offset] != '{') {
             offset++;
         }
         int len = strlen(str);
         int i = len - 1;
-        for(;i > 0;i--) {
-            if(str[i] != '}') {
+        for (; i > 0; i--) {
+            if (str[i] != '}') {
                 str[i] = '\0';
             } else {
                 break;
@@ -91,11 +113,6 @@ Status SocketHelper::getHostByName(char *host) {
     return OK;
 }
 
-Status SocketHelper::initEnv(JNIEnv *env1) {
-    env = env1;
-    return OK;
-};
-
 Status SocketHelper::setConvert(bool value) {
     isConvert = value;
     return OK;
@@ -106,7 +123,7 @@ Status SocketHelper::createSocket(char *host, int port) {
     snprintf(logMsg, BUFFER_SIZE, "%s", __func__);
     callJavaMethod();
 
-    if(strlen(host) >= sizeof(socketHost)){
+    if (strlen(host) >= sizeof(socketHost)) {
         LOGE("%s: socket host is too long !", __func__);
         return ERROR;
     }
@@ -177,7 +194,7 @@ Status SocketHelper::sendMessage(char *content) {
     // LOGI("%s: \r\n%s", __func__, content);
 
     int count = send(socketfd, content, strlen(content), 0);
-    if(count == strlen(content)) {
+    if (count == strlen(content)) {
         LOGI("%s: socket send  ok !", __func__);
     } else {
         LOGE("%s: socket send  fail !", __func__);
@@ -214,7 +231,7 @@ Status SocketHelper::sendHttpPostMsg(char *url, char *content) {
 
     int count = send(socketfd, packet, len, 0);
 
-    if(count == len) {
+    if (count == len) {
         LOGI("%s: socket send  ok !", __func__);
     } else {
         LOGE("%s: socket send  fail !", __func__);
@@ -247,7 +264,7 @@ Status SocketHelper::sendHttpGetMsg(char *url) {
 
     int count = send(socketfd, packet, len, 0);
 
-    if(count == len) {
+    if (count == len) {
         LOGI("%s: socket send  ok !", __func__);
     } else {
         LOGE("%s: socket send  fail !", __func__);
@@ -354,7 +371,7 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
             LOGW("%s: receive message overflow !", __func__);
         }
         char *p;
-        if((p = strstr(buffer, "HTTP/1.1")) != NULL) {
+        if ((p = strstr(buffer, "HTTP/1.1")) != NULL) {
             char code[3];
             strncpy(code, p + 9, 3);
             LOGD("responseCode : %d", atoi(code));
@@ -365,15 +382,15 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
         }
         if (strstr(buffer, "HTTP/1.1 200 OK") != NULL) {
             int flag = 0;
-            if((p = strstr(buffer, "Content-Type: application/json")) != NULL) {
+            if ((p = strstr(buffer, "Content-Type: application/json")) != NULL) {
                 flag = 1;
             }
             char *content;
             if ((p = strstr(buffer, "\r\n\r\n")) != NULL) {
                 p += 4;                        // skip "\r\n\r\n"
                 int len = strlen(p) + 1;
-                content = (char *)malloc(len * sizeof(char));
-                if(content == NULL) {
+                content = (char *) malloc(len * sizeof(char));
+                if (content == NULL) {
                     LOGE("%s: content == NULL !", __func__);
                     return ERROR;
                 }
