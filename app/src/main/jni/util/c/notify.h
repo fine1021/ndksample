@@ -11,8 +11,9 @@
  * jni String Type : java/lang/String  or  Ljava/lang/String;
  * javap -s xx.class query parameter type
  */
-void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
-    jclass cls = (*env)->FindClass(env, "com/example/fine/ndksample/ndkInterface/Messenger");
+void notifyMessageWithObj(JNIEnv *env, jobject obj, const char *msg) {
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
     if (cls == 0) {
         LOGE("find class error");
         return;
@@ -32,7 +33,8 @@ void notifyMessage(JNIEnv *env, jobject obj, const char *msg) {
 /**
  * call java class static method
  */
-void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
+void notifyMessageStatic(JNIEnv *env, char *msg) {
+
     jclass cls = (*env)->FindClass(env, "com/example/fine/ndksample/ndkInterface/Messenger");
     if (cls == 0) {
         LOGE("find class error");
@@ -53,7 +55,8 @@ void notifyMessageStatic(JNIEnv *env, jobject obj, char *msg) {
  * call java class method
  * the java class which calls jni native methods, is not the class which has callbacks
  */
-void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
+void notifyMessage(JNIEnv *env, const char *msg) {
+
     jclass cls = (*env)->FindClass(env, "com/example/fine/ndksample/ndkInterface/Messenger");
     if (cls == 0) {
         LOGE("find class error");
@@ -72,9 +75,9 @@ void notifyMessageObj(JNIEnv *env, jobject obj, const char *msg) {
     //  jobject (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
     //  jobject (*AllocObject)(JNIEnv*, jclass);
 
-    jobject jobj = (*env)->AllocObject(env, cls);
+    jobject obj = (*env)->AllocObject(env, cls);
 
-    (*env)->CallVoidMethod(env, jobj, method, (*env)->NewStringUTF(env, msg));
+    (*env)->CallVoidMethod(env, obj, method, (*env)->NewStringUTF(env, msg));
 }
 
 

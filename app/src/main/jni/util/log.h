@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ANDROID 1
 #define BUFFER_SIZE 1024
 #define RECV_SIZE BUFFER_SIZE * 2
 #define PACKET_SIZE BUFFER_SIZE * 8

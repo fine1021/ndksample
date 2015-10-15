@@ -1,6 +1,6 @@
 #include "../log.h"
 
-#ifdef LINUX /* START LINUX */
+#ifdef ANDROID
 
 #include <netinet/in.h>      // sockaddr_in struct
 #include <sys/types.h>       // socket data type
@@ -10,10 +10,8 @@
 #include <string.h>          // bzero
 #include <arpa/inet.h>       // inet_addr htons inet_ntoa inet_aton
 #include <netdb.h>           // hostent
-#include <stdio.h>
-#include <stdlib.h>
 
-#endif /* END LINUX */
+#endif
 
 #define OK 1
 #define ERROR 0
@@ -45,9 +43,7 @@ void initValue() {
 }
 
 void log() {
-#if defined(DEBUG) && DEBUG == 1
     LOGI("%s", logMsg);
-#endif
     memset(logMsg, 0, sizeof(logMsg));
 }
 

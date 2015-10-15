@@ -1,4 +1,5 @@
 #include "log.h"
+
 #ifdef CPP_COMPILE
 #include <string>
 using namespace std;

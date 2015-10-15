@@ -1,7 +1,6 @@
 //
 // Created by yexiaokang on 2015/9/29.
 //
-#define CPP_COMPILE
 
 #include "util/char.h"
 #include "socket/socket.cpp"
