@@ -1,23 +1,10 @@
 #include "log.h"
+#include <string.h>
 
-#ifdef CPP_COMPILE
+#ifdef __cplusplus
 #include <string>
 using namespace std;
-#endif
 
-
-char *ConstCharToChar(const char *str) {
-    int len = strlen(str) + 1;
-    char *buffer = (char *) malloc(sizeof(char) * len);
-    strncpy(buffer, str, len);
-    return buffer;
-}
-
-const char *CharToConstChar(char *str) {
-    return (const char *) str;
-}
-
-#ifdef CPP_COMPILE
 const char *StringToConstChar(string str) {
     return str.c_str();
 }
@@ -31,4 +18,16 @@ char *StringToChar(string str) {
     return buffer;
 }
 #endif
+
+char *ConstCharToChar(const char *str) {
+    int len = strlen(str) + 1;
+    char *buffer = (char *) malloc(sizeof(char) * len);
+    strncpy(buffer, str, len);
+    return buffer;
+}
+
+const char *CharToConstChar(char *str) {
+    return (const char *) str;
+}
+
 

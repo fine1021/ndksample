@@ -40,7 +40,8 @@
 #define usleep(dwMilliseconds) Sleep(dwMilliseconds)  // linux C usleep
 #endif
 
-extern JavaVM *javaVM;              // define global variable
+extern JavaVM *javaVM;                    // define global variable
+extern jobject callbackObj;               // define global variable
 
 #define OK 1
 #define ERROR 0

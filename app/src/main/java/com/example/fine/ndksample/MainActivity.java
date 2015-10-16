@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fine.ndksample.ndkInterface.HttpUtil;
 import com.example.fine.ndksample.ndkInterface.Messenger;
@@ -45,11 +46,19 @@ public class MainActivity extends AppCompatActivity {
         });
         callBack = new Messenger.MessageCallBack() {
             @Override
-            public void onCallBack(final String msg) {
+            public void onCallBackToast(String msg) {
+                mHandler.sendMessage(mHandler.obtainMessage(3, msg));
+            }
+
+            @Override
+            public void onCallBackMessage(String msg) {
                 mHandler.sendMessage(mHandler.obtainMessage(1, msg));
             }
         };
         Messenger.addListener(callBack);
+
+        Messenger messenger = new Messenger();
+        HttpUtil.socketCallback(messenger);
     }
 
     private void setCurrent(String text) {
@@ -58,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setConsole(String text) {
         console.setText(text);
+    }
+
+    private void showToast(String text) {
+        Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     private void socketConnect(final int type) {
@@ -78,8 +91,10 @@ public class MainActivity extends AppCompatActivity {
                     case 2:
                         /*url = "/appapi/userconfig?keyfrom=mdict.6.0.1.android&model=H30-T10&mid=4.4.2&imei=863654020071692&vendor=tencent&screen=720x1280&abtest=4&userid=nuaa_yxkang@163.com&username=nuaa_yxkang@163.com";
                         msg = HttpUtil.socketGetRequest("dict.youdao.com", url);*/
-                        url = "/public/2.0/bmt/translate?client_id=YourApiKey&q=today%0Atomorrow&from=auto&to=auto";
-                        msg = HttpUtil.socketGetRequest("openapi.baidu.com", url);
+                        /*url = "/public/2.0/bmt/translate?client_id=YourApiKey&q=today%0Atomorrow&from=auto&to=auto";
+                        msg = HttpUtil.socketGetRequest("openapi.baidu.com", url);*/
+                        url = "/1/yexiaokang/todo/getMyTodoInfo?start=1&count=10&appName=&arriveTime=&isMobile=0";
+                        msg = HttpUtil.socketGetRequest("moa2.hikvision.com", 90, url);
                         break;
                     case 3:
                         url = "/zjweb/MainBillInfo.do";
@@ -141,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 2:
                     mainActivity.setConsole(message.obj.toString());
+                    break;
+                case 3:
+                    mainActivity.showToast(message.obj.toString());
                     break;
             }
         }

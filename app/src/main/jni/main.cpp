@@ -7,6 +7,7 @@
 #include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"
 
 JavaVM *javaVM;
+jobject callbackObj;
 
 /*
  * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
@@ -76,6 +77,15 @@ jstring Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JN
     env->ReleaseStringUTFChars(host, sendHost);
     env->ReleaseStringUTFChars(content, sendContent);
     return env->NewStringUTF(msg);
+}
+
+/*
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
+ * Method:    setCallback
+ * Signature: (Ljava/lang/Object;)V
+ */
+void Java_com_example_fine_ndksample_ndkInterface_HttpUtil_setCallback(JNIEnv *env, jclass jcls, jobject obj) {
+    callbackObj = env->NewGlobalRef(obj);
 }
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {

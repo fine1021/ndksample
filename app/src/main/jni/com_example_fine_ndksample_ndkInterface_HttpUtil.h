@@ -31,6 +31,14 @@ JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_
 JNIEXPORT jstring JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect
   (JNIEnv *, jclass, jstring, jint, jstring, jint);
 
+/*
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
+ * Method:    setCallback
+ * Signature: (Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL Java_com_example_fine_ndksample_ndkInterface_HttpUtil_setCallback
+  (JNIEnv *, jclass, jobject);
+
 #ifdef __cplusplus
 }
 #endif

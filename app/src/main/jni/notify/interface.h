@@ -16,11 +16,13 @@ typedef struct {
 
     void (*initJavaVM)(JavaVM *vm);                             // init javaVM
 
+    void (*setCallback)(jobject obj);                           // setCallback
+
     int (*notifyMessage)(char *msg);                            // specify a class
 
     int (*notifyMessageStatic)(char *msg);                      // static method
 
-    int (*notifyMessageWithCallback)(jobject obj, char *msg);   // custom class
+    int (*notifyMessageWithObj)(char *msg);                     // custom callBack Obj class
 
 } JavaMethodInterface;
 

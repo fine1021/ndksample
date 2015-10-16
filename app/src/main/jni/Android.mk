@@ -19,7 +19,7 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := socket
 LOCAL_SRC_FILES := main2.cpp
-LOCAL_CFLAGS := -DANDROID -DCPP_COMPILE
+LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -30,7 +30,7 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := notify
 LOCAL_SRC_FILES := notify/notify.cpp
-LOCAL_CFLAGS := -DANDROID -DCPP_COMPILE
+LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)
 

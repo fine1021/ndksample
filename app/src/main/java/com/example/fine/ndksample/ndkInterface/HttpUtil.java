@@ -19,8 +19,14 @@ public class HttpUtil {
 
     private static native String doSocketConnect(String host, int port, String content, int flag);
 
+    private static native void setCallback(Object object);
+
     static {
         System.loadLibrary("socket");
+    }
+
+    public static void socketCallback(Object object) {
+        setCallback(object);
     }
 
     public static String socketConnect(String host, String content) {
@@ -29,6 +35,10 @@ public class HttpUtil {
 
     public static String socketGetRequest(String host, String url) {
         return doGetRequest(host, PORT, url, FLAG_CONVERT);
+    }
+
+    public static String socketGetRequest(String host, int port, String url) {
+        return doGetRequest(host, port, url, FLAG_CONVERT);
     }
 
     public static String socketPostRequest(String host, String url, String content) {

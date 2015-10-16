@@ -35,12 +35,21 @@ public class Messenger {
     public void notifyMessage(String msg) {
         synchronized (sMutex) {
             for (MessageCallBack callBack : sCallBacks) {
-                callBack.onCallBack(msg);
+                callBack.onCallBackMessage(msg);
+            }
+        }
+    }
+
+    public void notifyToast(String msg) {
+        synchronized (sMutex) {
+            for (MessageCallBack callBack : sCallBacks) {
+                callBack.onCallBackToast(msg);
             }
         }
     }
 
     public interface MessageCallBack {
-        void onCallBack(String msg);
+        void onCallBackToast(String msg);
+        void onCallBackMessage(String msg);
     }
 }

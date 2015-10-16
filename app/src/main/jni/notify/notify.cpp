@@ -9,16 +9,21 @@
  * jni String Type : java/lang/String  or  Ljava/lang/String;
  * javap -s xx.class query parameter type
  */
-void notifyMessageWithObj(JNIEnv *env, jobject obj, const char *msg) {
+void notifyMessageWithObj(JNIEnv *env, const char *msg) {
 
-    jclass clazz = env->GetObjectClass(obj);
+    if(callbackObject == NULL) {
+        LOGE("callbackObject == NULL");
+        return;
+    }
+
+    jclass clazz = env->GetObjectClass(callbackObject);
     if (clazz == 0) {
         LOGE("find class error");
         return;
     }
 
     // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
-    jmethodID method = env->GetMethodID(clazz, "notifyMessage", "(Ljava/lang/String;)V");
+    jmethodID method = env->GetMethodID(clazz, "notifyToast", "(Ljava/lang/String;)V");
     if (method == 0) {
         LOGE("find method error");
         return;
@@ -26,7 +31,7 @@ void notifyMessageWithObj(JNIEnv *env, jobject obj, const char *msg) {
 
     jstring msgString = env->NewStringUTF(msg);
     // void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
-    env->CallVoidMethod(obj, method, msgString);
+    env->CallVoidMethod(callbackObject, method, msgString);
     env->DeleteLocalRef(msgString);
 }
 
@@ -82,6 +87,35 @@ void notifyMessage(JNIEnv *env, const char *msg) {
     env->DeleteLocalRef(msgString);
 }
 
+/**
+ * call java class method
+ * the java class which calls jni native methods, is not the class which has callbacks
+ */
+void notifyToast(JNIEnv *env, const char *msg) {
+
+    jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
+    if (clazz == 0) {
+        LOGE("find class error");
+        return;
+    }
+
+    // jmethodID (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID method = env->GetMethodID(clazz, "notifyMessage", "(Ljava/lang/String;)V");
+    if (method == 0) {
+        LOGE("find method error");
+        return;
+    }
+
+    //  void (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    //  jobject (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
+    //  jobject (*AllocObject)(JNIEnv*, jclass);
+
+    jstring msgString = env->NewStringUTF(msg);
+    jobject obj = env->AllocObject(clazz);
+    env->CallVoidMethod(obj, method, msgString);
+    env->DeleteLocalRef(msgString);
+}
+
 void initJavaVM(JavaVM *vm) {
     jvm = vm;
 }
@@ -108,19 +142,24 @@ int callJavaMethodStatic(char *msg) {
     }
 }
 
-int callJavaMethodWithObj(jobject obj, char *msg) {
+int callJavaMethodWithObj(char *msg) {
     if (jvm != NULL) {
         JNIEnv *env = NULL;
         if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
             LOGE("GetEnv Failed !");
             return JNI_ERR;
         }
-        notifyMessageWithObj(env, obj, msg);
+        notifyMessageWithObj(env, msg);
     }
+}
+
+void javaMethodCallback(jobject obj) {
+    callbackObject = obj;
 }
 
 JavaMethodInterface javaMethodInterface = {
         initJavaVM,
+        javaMethodCallback,
         callJavaMethod,
         callJavaMethodStatic,
         callJavaMethodWithObj

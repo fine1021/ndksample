@@ -3,6 +3,7 @@
 //
 
 #include "socket.h"
+#include "../notify/interface.h"
 
 SocketHelper::SocketHelper() {
     init();
@@ -40,6 +41,7 @@ void SocketHelper::loadJavaMethod() {
     }
     javaMethodInterface = getInterface();
     javaMethodInterface->initJavaVM(javaVM);
+    javaMethodInterface->setCallback(callbackObj);
 }
 
 void SocketHelper::callJavaMethod() {
@@ -288,14 +290,14 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
 
     select_timeout.tv_sec = 3;
     select_timeout.tv_usec = 0;
-    int jump = 0;
     int ret = 0;
     int count = 0;
     int single = 0;
+    bool alive = true;
     char data[RECV_SIZE];
     bzero(buffer, bufferSize);
 
-    while (jump < 3) {
+    while (alive) {
         FD_ZERO(&rset);
         FD_SET(socketfd, &rset);
         ret = 0;
@@ -313,10 +315,10 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
                 single = recv(socketfd, data, sizeof(data), 0);
                 strncat(buffer, data, single);
                 count += single;
+                alive = single > 0 && count < bufferSize;
             }
         }
         usleep(500);
-        jump++;
     }
 
     /**
@@ -336,28 +338,28 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
 	setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeOut, sizeof(timeOut));
 #endif
 
-    int next = 1;
-    int single = 0;
     int count = 0;
+    int single = 0;
+    bool alive = true;
     char data[RECV_SIZE];
     bzero(data, sizeof(data));
     bzero(buffer, bufferSize);
-    while(next) {
+    while(alive) {
         single = recv(socketfd, data, sizeof(data), 0);
         if(single > 0) {
-            next = 1;
             strncat(buffer, data, single);
             count += single;
+            alive = count < bufferSize;
         } else {
-            next = 0;
+            alive = false;
         }
-        if(next == 1) {
+        if(alive) {
             single = 0;
             bzero(data, sizeof(data));
             usleep(500);
         }
 #ifdef ANDROID
-        printf("%s: errno = %d msg = %s\n", __func__, errno, strerror(errno));
+        LOGI("%s: errno = %d msg = %s\n", __func__, errno, strerror(errno));
 #endif
     }*/
 
@@ -367,15 +369,19 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
     // LOGD("%s: \n%s", __func__, buffer);
 
     if (count > 0) {
-        if (count > PACKET_SIZE) {
+        if (count >= bufferSize) {
             LOGW("%s: receive message overflow !", __func__);
+            javaMethodInterface->notifyMessageWithObj("receive message overflow !");
         }
         char *p;
         if ((p = strstr(buffer, "HTTP/1.1")) != NULL) {
-            char code[3];
+            char *code;
+            code = (char *)malloc(3 * sizeof(char));
             strncpy(code, p + 9, 3);
-            LOGD("responseCode : %d", atoi(code));
+            LOGD("Response Code : %d", atoi(code));
+            free(code);
         } else {
+            javaMethodInterface->notifyMessageWithObj("not found error !");
             LOGD("%s: \n%s", __func__, buffer);
             bzero(buffer, bufferSize);            // clear buffer, since the message is invalid
             return ERROR;
@@ -384,6 +390,15 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
             int flag = 0;
             if ((p = strstr(buffer, "Content-Type: application/json")) != NULL) {
                 flag = 1;
+            }
+            int length = -1;
+            if ((p = strstr(buffer, "Content-Length: ")) != NULL) {
+                char *code2;
+                code2 = (char *)malloc(5 * sizeof(char));
+                strncpy(code2, p + 16, 5);
+                length = atoi(code2);
+                LOGD("Content-Length : %d", length);
+                free(code2);
             }
             char *content;
             if ((p = strstr(buffer, "\r\n\r\n")) != NULL) {
@@ -394,13 +409,17 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
                     LOGE("%s: content == NULL !", __func__);
                     return ERROR;
                 }
-                strcpy(content, p);                        // copy to content
+                strcpy(content, p);                             // copy the content
+                if(length > 0 && strlen(content) != length) {   // check receive length
+                    LOGE("%s: receive length error !", __func__);
+                    javaMethodInterface->notifyMessageWithObj("receive length error !");
+                }
                 int offset = formatString(content, flag);
-                bzero(buffer, bufferSize);                 // clear buffer
-                strcpy(buffer, content + offset);          // copy the content to buffer
+                bzero(buffer, bufferSize);                      // clear buffer
+                strcpy(buffer, content + offset);               // copy the content to buffer
                 //bcopy(content + offset, buffer, strlen(content));
                 buffer[strlen(content) - offset] = '\0';
-                free(content);                             // free content
+                free(content);                                  // free content
             }
         } else {
             bzero(buffer, bufferSize);              // clear buffer, since the message is invalid

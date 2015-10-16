@@ -8,13 +8,14 @@
 #include "interface.h"
 
 JavaVM *jvm = NULL;
+jobject callbackObject;
 
 /**
  * call java class method
  * jni String Type : java/lang/String  or  Ljava/lang/String;
  * javap -s xx.class query parameter type
  */
-void notifyMessageWithObj(JNIEnv *env, jobject obj, const char *msg);
+void notifyMessageWithObj(JNIEnv *env, const char *msg);
 
 /**
  * call java class static method

@@ -8,6 +8,7 @@
 #define NELEM(x)  (sizeof(x) / sizeof((x)[0]))
 
 JavaVM *javaVM;
+jobject callbackObj;
 const char *classPath = "com/example/fine/ndksample/ndkInterface/HttpUtil";
 
 /**
@@ -72,10 +73,21 @@ jstring doSocketConnect(JNIEnv *env, jclass clazz, jstring host, jint port, jstr
     return env->NewStringUTF(msg);
 }
 
+/*
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
+ * Method:    setCallback
+ * Signature: (Ljava/lang/Object;)V
+ */
+void setCallback(JNIEnv *env, jclass clazz, jobject obj) {
+    callbackObj = env->NewGlobalRef(obj);
+}
+
+
 JNINativeMethod methods[] = {
         {"doPostRequest",   "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;I)Ljava/lang/String;", (void *) doPostRequest},
         {"doGetRequest",    "(Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;",                   (void *) doGetRequest},
-        {"doSocketConnect", "(Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;",                   (void *) doSocketConnect}
+        {"doSocketConnect", "(Ljava/lang/String;ILjava/lang/String;I)Ljava/lang/String;",                   (void *) doSocketConnect},
+        {"setCallback",     "(Ljava/lang/Object;)V",                                                        (void *) setCallback}
 };
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {

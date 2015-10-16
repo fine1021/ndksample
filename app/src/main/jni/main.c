@@ -47,3 +47,12 @@ jstring Java_com_example_fine_ndksample_ndkInterface_HttpUtil_doSocketConnect(JN
     (*env)->ReleaseStringUTFChars(env, host, ip);
     return (*env)->NewStringUTF(env, msg);
 }
+
+/*
+ * Class:     com_example_fine_ndksample_ndkInterface_HttpUtil
+ * Method:    setCallback
+ * Signature: (Ljava/lang/Object;)V
+ */
+void Java_com_example_fine_ndksample_ndkInterface_HttpUtil_setCallback(JNIEnv *env, jclass jcls, jobject obj) {
+
+}
