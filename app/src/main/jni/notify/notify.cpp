@@ -120,6 +120,10 @@ void initJavaVM(JavaVM *vm) {
     jvm = vm;
 }
 
+void javaMethodCallback(jobject obj) {
+    callbackObject = obj;
+}
+
 int callJavaMethod(char *msg) {
     if (jvm != NULL) {
         JNIEnv *env = NULL;
@@ -151,10 +155,6 @@ int callJavaMethodWithObj(char *msg) {
         }
         notifyMessageWithObj(env, msg);
     }
-}
-
-void javaMethodCallback(jobject obj) {
-    callbackObject = obj;
 }
 
 JavaMethodInterface javaMethodInterface = {
