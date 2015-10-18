@@ -394,6 +394,7 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
         } else {
             javaMethodInterface->notifyMessageWithObj("not found error !");
             LOGD("%s: \n%s", __func__, packet);
+            free(packet);
             return ERROR;
         }
         if (strstr(packet, "HTTP/1.1 200 OK") != NULL) {
