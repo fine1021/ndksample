@@ -9,6 +9,7 @@
 #include <android/log.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BUFFER_SIZE 1024
 #define RECV_SIZE BUFFER_SIZE * 2

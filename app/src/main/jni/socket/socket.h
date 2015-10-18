@@ -11,6 +11,8 @@
 #endif
 
 #include "../notify/interface.h"
+#include <string>
+using namespace std;
 
 #ifdef ANDROID
 
@@ -66,6 +68,7 @@ private:
     char logMsg[PACKET_SIZE];        // log message
     bool isConvert;                  // if need to convert domain name to ip
     JavaMethodInterface *javaMethodInterface;
+    string Packet;
 
     void init();
 

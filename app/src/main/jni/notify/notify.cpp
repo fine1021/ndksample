@@ -38,7 +38,7 @@ void notifyMessageWithObj(JNIEnv *env, const char *msg) {
 /**
  * call java class static method
  */
-void notifyMessageStatic(JNIEnv *env, char *msg) {
+void notifyMessageStatic(JNIEnv *env, const char *msg) {
 
     jclass clazz = env->FindClass("com/example/fine/ndksample/ndkInterface/Messenger");
     if (clazz == 0) {
@@ -124,7 +124,7 @@ void javaMethodCallback(jobject obj) {
     callbackObject = obj;
 }
 
-int callJavaMethod(char *msg) {
+int callJavaMethod(const char *msg) {
     if (jvm != NULL) {
         JNIEnv *env = NULL;
         if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
@@ -135,7 +135,7 @@ int callJavaMethod(char *msg) {
     }
 }
 
-int callJavaMethodStatic(char *msg) {
+int callJavaMethodStatic(const char *msg) {
     if (jvm != NULL) {
         JNIEnv *env = NULL;
         if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
@@ -146,7 +146,7 @@ int callJavaMethodStatic(char *msg) {
     }
 }
 
-int callJavaMethodWithObj(char *msg) {
+int callJavaMethodWithObj(const char *msg) {
     if (jvm != NULL) {
         JNIEnv *env = NULL;
         if (jvm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {

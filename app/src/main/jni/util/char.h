@@ -1,5 +1,4 @@
 #include "log.h"
-#include <string.h>
 
 #ifdef __cplusplus
 #include <string>

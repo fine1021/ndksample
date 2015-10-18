@@ -18,11 +18,11 @@ typedef struct {
 
     void (*setCallback)(jobject obj);                           // setCallback
 
-    int (*notifyMessage)(char *msg);                            // specify a class
+    int (*notifyMessage)(const char *msg);                      // specify a class
 
-    int (*notifyMessageStatic)(char *msg);                      // static method
+    int (*notifyMessageStatic)(const char *msg);                // static method
 
-    int (*notifyMessageWithObj)(char *msg);                     // custom callBack Obj class
+    int (*notifyMessageWithObj)(const char *msg);               // custom callBack Obj class
 
 } JavaMethodInterface;
 

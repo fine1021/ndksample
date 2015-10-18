@@ -295,7 +295,9 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
     int single = 0;
     bool alive = true;
     char data[RECV_SIZE];
+    bzero(data, sizeof(data));
     bzero(buffer, bufferSize);
+    Packet.clear();
 
     while (alive) {
         FD_ZERO(&rset);
@@ -313,9 +315,9 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
             LOGI("%s: select ret = %d", __func__, ret);
             if (FD_ISSET(socketfd, &rset)) {
                 single = recv(socketfd, data, sizeof(data), 0);
-                strncat(buffer, data, single);
+                Packet.append(data, single);
                 count += single;
-                alive = single > 0 && count < bufferSize;
+                alive = single > 0;
             }
         }
         usleep(500);
@@ -344,12 +346,14 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
     char data[RECV_SIZE];
     bzero(data, sizeof(data));
     bzero(buffer, bufferSize);
+    Packet.clear();
+
     while(alive) {
         single = recv(socketfd, data, sizeof(data), 0);
         if(single > 0) {
-            strncat(buffer, data, single);
+            Packet.append(data, single);
             count += single;
-            alive = count < bufferSize;
+            alive = true;
         } else {
             alive = false;
         }
@@ -363,69 +367,80 @@ Status SocketHelper::recvMessage(char *buffer, int bufferSize) {
 #endif
     }*/
 
-    fputs(buffer, fp);
+    /**
+     * copy the string content
+     */
+    int packet_len = Packet.length() + 1;
+    char *packet = (char *)malloc(packet_len * sizeof(char));
+    strncpy(packet, Packet.c_str(), packet_len);
+
+    Packet.clear();                                 // clear the receive buffer
+
+    /**
+     * write file
+     */
+    fputs(packet, fp);
     fclose(fp);
 
     // LOGD("%s: \n%s", __func__, buffer);
 
     if (count > 0) {
-        if (count >= bufferSize) {
-            LOGW("%s: receive message overflow !", __func__);
-            javaMethodInterface->notifyMessageWithObj("receive message overflow !");
-        }
-        char *p;
-        if ((p = strstr(buffer, "HTTP/1.1")) != NULL) {
-            char *code;
-            code = (char *)malloc(3 * sizeof(char));
+        char *p = strstr(packet, "HTTP/1.1");
+        if (p != NULL) {
+            char *code = (char *)malloc(3 * sizeof(char));
             strncpy(code, p + 9, 3);
             LOGD("Response Code : %d", atoi(code));
             free(code);
         } else {
             javaMethodInterface->notifyMessageWithObj("not found error !");
-            LOGD("%s: \n%s", __func__, buffer);
-            bzero(buffer, bufferSize);            // clear buffer, since the message is invalid
+            LOGD("%s: \n%s", __func__, packet);
             return ERROR;
         }
-        if (strstr(buffer, "HTTP/1.1 200 OK") != NULL) {
+        if (strstr(packet, "HTTP/1.1 200 OK") != NULL) {
             int flag = 0;
-            if ((p = strstr(buffer, "Content-Type: application/json")) != NULL) {
+            if ((p = strstr(packet, "Content-Type: application/json")) != NULL) {
                 flag = 1;
             }
             int length = -1;
-            if ((p = strstr(buffer, "Content-Length: ")) != NULL) {
-                char *code2;
-                code2 = (char *)malloc(5 * sizeof(char));
+            if ((p = strstr(packet, "Content-Length: ")) != NULL) {
+                char *code2 = (char *)malloc(5 * sizeof(char));
                 strncpy(code2, p + 16, 5);
                 length = atoi(code2);
                 LOGD("Content-Length : %d", length);
                 free(code2);
             }
-            char *content;
-            if ((p = strstr(buffer, "\r\n\r\n")) != NULL) {
-                p += 4;                        // skip "\r\n\r\n"
+            if ((p = strstr(packet, "\r\n\r\n")) != NULL) {
+                p += 4;                                          // skip "\r\n\r\n"
                 int len = strlen(p) + 1;
-                content = (char *) malloc(len * sizeof(char));
+                char *content = (char *) malloc(len * sizeof(char));
                 if (content == NULL) {
                     LOGE("%s: content == NULL !", __func__);
                     return ERROR;
                 }
-                strcpy(content, p);                             // copy the content
-                if(length > 0 && strlen(content) != length) {   // check receive length
-                    LOGE("%s: receive length error !", __func__);
+                strncpy(content, p, len);                        // copy the content
+                int content_strlen = strlen(content);            // strlen of content
+                if(length > 0 && content_strlen != length) {     // check receive length
+                    LOGE("%s: receive length error ! ", __func__);
+                    LOGE("%s: length = %d strlen = %d ", __func__, length, content_strlen);
                     javaMethodInterface->notifyMessageWithObj("receive length error !");
                 }
+                if (content_strlen >= bufferSize) {
+                    LOGW("%s: receive message overflow !", __func__);
+                    javaMethodInterface->notifyMessageWithObj("receive message overflow !");
+                }
                 int offset = formatString(content, flag);
-                bzero(buffer, bufferSize);                      // clear buffer
                 strcpy(buffer, content + offset);               // copy the content to buffer
-                //bcopy(content + offset, buffer, strlen(content));
-                buffer[strlen(content) - offset] = '\0';
+                //bcopy(content + offset, buffer, content_strlen);
+                buffer[content_strlen - offset] = '\0';
                 free(content);                                  // free content
             }
+            free(packet);
         } else {
-            bzero(buffer, bufferSize);              // clear buffer, since the message is invalid
+            free(packet);
             return ERROR;
         }
     } else {
+        free(packet);
         return ERROR;
     }
 
