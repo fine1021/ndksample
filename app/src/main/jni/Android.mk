@@ -44,3 +44,14 @@ LOCAL_SRC_FILES := main.c
 LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)
+
+# fourth library
+
+include $(CLEAR_VARS)
+
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
+LOCAL_MODULE := socket3
+LOCAL_SRC_FILES := main.cpp
+LOCAL_CFLAGS := -DANDROID
+
+include $(BUILD_SHARED_LIBRARY)
