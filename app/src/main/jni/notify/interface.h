@@ -5,7 +5,8 @@
 #ifndef NDKSAMPLE_INTERFACE_H
 #define NDKSAMPLE_INTERFACE_H
 
-#include "../util/log.h"
+#include "../util/JNIHelp.h"
+#include "../util/reference.h"
 
 #ifdef __cplusplus
 extern "C"

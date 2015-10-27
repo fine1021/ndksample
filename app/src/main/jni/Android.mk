@@ -18,7 +18,7 @@ include $(CLEAR_VARS)
 
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := socket
-LOCAL_SRC_FILES := main2.cpp
+LOCAL_SRC_FILES := main2.cpp onload.cpp util/JNIHelp.cpp
 LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)

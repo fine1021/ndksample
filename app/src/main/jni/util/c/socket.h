@@ -1,4 +1,5 @@
-#include "../log.h"
+#include "../JNIHelp.h"
+#include "../reference.h"
 
 #ifdef ANDROID
 

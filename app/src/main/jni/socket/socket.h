@@ -11,7 +11,9 @@
 #endif
 
 #include "../notify/interface.h"
+#include "../util/reference.h"
 #include <string>
+
 using namespace std;
 
 #ifdef ANDROID
