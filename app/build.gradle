@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.application'
 
 android {
@@ -12,7 +14,7 @@ android {
     }
 
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId "com.example.fine.ndksample"
         minSdkVersion 10
@@ -39,15 +41,21 @@ android {
         }
     }
 
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild
-    }
-
+    // call regular ndk-build(.cmd) script
     task ndkBuild(type: Exec) {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        def ndkbuild = properties.getProperty('ndk.dir', null) + "/ndk-build.cmd"
-        commandLine ndkbuild, '-C', file('src/main/jni').absolutePath
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            def command = properties.getProperty('ndk.dir', null) + "/ndk-build.cmd"
+            commandLine command, '-C', file('src/main/jni').absolutePath
+        } else {
+            def command = properties.getProperty('ndk.dir', null) + "/ndk-build"
+            commandLine command, '-C', file('src/main/jni').absolutePath
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
     }
 }
 

@@ -43,7 +43,7 @@ void initValue() {
     bzero(address, sizeof(address));
 }
 
-void log() {
+void logM() {
     LOGI("%s", logMsg);
     memset(logMsg, 0, sizeof(logMsg));
 }
@@ -58,11 +58,11 @@ Status getHostByName(char *host) {
     }
 
     snprintf(logMsg, BUFFER_SIZE, "%s: official name = %s", __func__, hptr->h_name);
-    log();
+    logM();
 
     for (pptr = hptr->h_aliases; *pptr != NULL; pptr++) {
         snprintf(logMsg, BUFFER_SIZE, "%s: aliases = %s", __func__, *pptr);
-        log();
+        logM();
         switch (hptr->h_addrtype) {
             case AF_INET:
                 pptr = hptr->h_addr_list;
@@ -70,7 +70,7 @@ Status getHostByName(char *host) {
                     char buffer[64];
                     inet_ntop(AF_INET, *pptr, buffer, sizeof(buffer));
                     snprintf(logMsg, BUFFER_SIZE, "%s: address = %s", __func__, buffer);
-                    log();
+                    logM();
                 }
                 break;
         }
@@ -79,7 +79,7 @@ Status getHostByName(char *host) {
     /* address, for backward compatibility */
     inet_ntop(AF_INET, hptr->h_addr, address, sizeof(address));
     snprintf(logMsg, BUFFER_SIZE, "%s: IP = %s", __func__, address);
-    log();
+    logM();
     return OK;
 }
 
@@ -98,7 +98,7 @@ Status initSocket(char *host, int port) {
     }
 
     snprintf(logMsg, BUFFER_SIZE, "%s: socketfd = %d", __func__, socketfd);
-    log();
+    logM();
 
     socket_addr.addr4.sin_family = AF_INET;                 // AF_INET6 for IPV6
     socket_addr.addr4.sin_port = htons(port);
@@ -110,7 +110,7 @@ Status initSocket(char *host, int port) {
     char buffer[64];
     inet_ntop(AF_INET, &socket_addr.addr4.sin_addr, buffer, sizeof(buffer));
     snprintf(logMsg, BUFFER_SIZE, "%s: ip = %s, port = %d", __func__, buffer, port);
-    log();
+    logM();
 
     return OK;
 }
@@ -129,7 +129,7 @@ Status connectSocket() {
     }
 
     snprintf(logMsg, BUFFER_SIZE, "%s: connect OK !", __func__);
-    log();
+    logM();
 
     return OK;
 }
@@ -145,12 +145,12 @@ Status sendMessage(char *msg) {
     snprintf(buffer, BUFFER_SIZE, "%s", msg);
 
     snprintf(logMsg, BUFFER_SIZE, "%s: msg = %s", __func__, msg);
-    log();
+    logM();
 
     int ret = send(socketfd, buffer, strlen(buffer), 0);
 
     snprintf(logMsg, BUFFER_SIZE, "%s: count = %d", __func__, ret);
-    log();
+    logM();
 
     return OK;
 }
@@ -182,7 +182,7 @@ Status recvMessage(char *msg) {
             break;
         } else {
             snprintf(logMsg, BUFFER_SIZE, "%s: select ret = %d", __func__, ret);
-            log();
+            logM();
             if (FD_ISSET(socketfd, &rset)) {
                 count += recv(socketfd, data, sizeof(data), 0);
                 strncat(msg, data, strlen(data));
@@ -196,7 +196,7 @@ Status recvMessage(char *msg) {
 
     if (count != -1) {
         snprintf(logMsg, BUFFER_SIZE, "%s: count = %d, msg = %s", __func__, count, msg);
-        log();
+        logM();
         msg[count] = '\0';
     } else {
         return ERROR;
@@ -215,7 +215,7 @@ Status closeSocket() {
     close(socketfd);
 
     snprintf(logMsg, BUFFER_SIZE, "%s: close socket !", __func__);
-    log();
+    logM();
 
     return OK;
 }
