@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         url = "/zjweb/MainBillInfo.do";
-                        content = "versionid=2.1.3&session=MDAIEFJRQODLUGVC32UB5QC3&num=13567175635&channelid=1&channel=1";
+                        content = "versionid=2.1.3&session=VXPFWSADD5VLZGEJCDU95470&num=13567175635&channelid=1&channel=1";
                         msg = HttpUtil.socketPostRequest("app.m.zj.chinamobile.com", url, content);
                         /*url = "/langdetect";
                         content = "query=hello";
