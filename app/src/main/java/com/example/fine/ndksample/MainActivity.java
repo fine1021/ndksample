@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
         Messenger messenger = new Messenger();
         HttpUtil.socketCallback(messenger);
+
+        SystemProperties.get("ro.build.display.id", "");
     }
 
     private void setCurrent(String text) {

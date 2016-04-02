@@ -20,6 +20,7 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := socket
 LOCAL_SRC_FILES := main2.cpp onload.cpp util/JNIHelp.cpp
 LOCAL_CFLAGS := -DANDROID
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -31,6 +32,7 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := notify
 LOCAL_SRC_FILES := notify/notify.cpp
 LOCAL_CFLAGS := -DANDROID
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -42,6 +44,7 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := socket2
 LOCAL_SRC_FILES := main.c
 LOCAL_CFLAGS := -DANDROID
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -53,5 +56,31 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := socket3
 LOCAL_SRC_FILES := main.cpp
 LOCAL_CFLAGS := -DANDROID
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := properties
+LOCAL_SRC_FILES := libproperties.so
+LOCAL_MODULE_TAGS := optional
+
+include $(PREBUILT_SHARED_LIBRARY)
+
+#include $(CLEAR_VARS)
+
+#LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
+#LOCAL_MODULE := properties
+#LOCAL_SRC_FILES := properties.cpp util/JNIHelp.cpp
+#LOCAL_SHARED_LIBRARIES := libcutils
+#LOCAL_MODULE_TAGS := optional
+
+#include $(BUILD_SHARED_LIBRARY)
+
+#include $(CLEAR_VARS)
+
+#LOCAL_MODULE_TAGS := optional
+#LOCAL_PREBUILT_LIBS := libcutils:libcutils.so
+
+#include $(BUILD_MULTI_PREBUILT)
