@@ -6,9 +6,13 @@
 #define NDKSAMPLE_JNIHELP_H
 
 #include <jni.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <android/log.h>
 
-#define LOG_TAG "android_native"
+#ifndef LOG_TAG
+#define LOG_TAG "jni_native"
+#endif
 
 
 #ifndef LOGV

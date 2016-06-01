@@ -3,7 +3,6 @@
 //
 
 #include "socket.h"
-#include "../notify/interface.h"
 
 SocketHelper::SocketHelper() {
     init();

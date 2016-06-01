@@ -2,6 +2,8 @@
 // Created by yexiaokang on 2015/9/29.
 //
 
+#define LOG_TAG "SocketNative"
+
 #include "util/char.h"
 #include "socket/socket.cpp"
 #include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"

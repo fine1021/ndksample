@@ -2,6 +2,8 @@
 // Created by yexiaokang on 2015/10/13.
 //
 
+#define LOG_TAG "SocketNative"
+
 #include "util/char.h"
 #include "util/JNIHelp.h"
 #include "socket/socket.cpp"
