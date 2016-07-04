@@ -8,15 +8,41 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <android/log.h>
 
-#ifndef LOG_TAG
-#define LOG_TAG "jni_native"
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+/*
+ * Normally we strip LOGV (VERBOSE messages) from release builds.
+ * You can modify this (for example with "#define LOG_NDEBUG 0"
+ * at the top of your source file) to change that behavior.
+ */
+#ifndef LOG_NDEBUG
+#ifdef NDEBUG
+#define LOG_NDEBUG 1
+#else
+#define LOG_NDEBUG 0
+#endif
+#endif
+
+/*
+ * This is the local tag used for the following simplified
+ * logging macros.  You can change this preprocessor definition
+ * before using the other macros to change the tag.
+ */
+#ifndef LOG_TAG
+#define LOG_TAG NULL
+#endif
 
 #ifndef LOGV
+#if LOG_NDEBUG
+#define LOGV(...)   ((void)0)
+#else
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
+#endif
 #endif
 
 #ifndef LOGD
@@ -41,4 +67,8 @@
 
 int jniRegisterNativeMethods(JNIEnv *env, const char *className, const JNINativeMethod *gMethods, int numMethods);
 
-#endif //NDKSAMPLE_JNIHELP_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif //JNIHELP_H
