@@ -1,9 +1,34 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 apply plugin: 'com.android.application'
 
 android {
+    compileSdkVersion 24
+    buildToolsVersion '24.0.2'
+    defaultConfig {
+        applicationId "com.example.fine.ndksample"
+        minSdkVersion 16
+        // solved libsystem_api.so: has text relocations
+        targetSdkVersion 22
+        versionCode 1
+        versionName '1.0.0'
 
+        externalNativeBuild {
+            ndkBuild {
+
+                // Specifies which native libraries to build and package for this
+                // product flavor. If you don't configure this property, Gradle
+                // builds and packages all shared object libraries that you define
+                // in your CMake or ndk-build project.
+
+                abiFilters "armeabi-v7a", "armeabi", 'arm64-v8a', 'x86', 'x86_64'
+            }
+        }
+
+        ndk {
+            // Specifies the ABI configurations of your native libraries
+            // Gradle should build and package with your APK.
+            abiFilters "armeabi-v7a", "armeabi"
+        }
+    }
     signingConfigs {
         release {
             keyAlias 'fine'
@@ -12,17 +37,6 @@ android {
             storePassword 'yexiaokang'
         }
     }
-
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
-    defaultConfig {
-        applicationId "com.example.fine.ndksample"
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
-    }
-
     buildTypes {
         release {
             minifyEnabled true
@@ -33,8 +47,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
-
-    sourceSets {
+    /*sourceSets {
         main {
             jniLibs.srcDirs 'src/main/libs'
             jni.srcDirs = []                    // disable automatic ndk-build call
@@ -42,6 +55,7 @@ android {
     }
 
     // call regular ndk-build(.cmd) script
+    // import org.apache.tools.ant.taskdefs.condition.Os
     task ndkBuild(type: Exec) {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -56,11 +70,21 @@ android {
 
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkBuild
+    }*/
+
+    // You use this block to link Gradle to your CMake or ndk-build script.
+    externalNativeBuild {
+        ndkBuild {
+            // If you want to link Gradle to an existing ndk-build project,
+            // use the ndkBuild {} block instead of cmake {}, and provide a relative path to your Android.mk file.
+            // Gradle also includes the Application.mk file if it is located in the same directory as your Android.mk file.
+            path "src/main/jni/Android.mk"
+        }
     }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.yxkang.android:support:1.0.2'
+    compile 'com.yxkang.android:support:1.0.5'
+    compile 'com.android.support:appcompat-v7:24.2.1'
 }

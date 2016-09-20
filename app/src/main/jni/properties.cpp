@@ -2,9 +2,8 @@
 // Created by yexiaokang on 2016/4/1.
 //
 
-#include <cutils/properties.h>
+#include "SystemAPI.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include "util/JNIHelp.h"
 
 const char *className = "com/example/fine/ndksample/SystemProperties";
@@ -24,7 +23,7 @@ jstring SystemProperties_native_get(JNIEnv *env, jobject clazz, jstring keyJ, js
 
     key = env->GetStringUTFChars(keyJ, NULL);
 
-    len = property_get(key, buf, "");
+    len = system_property_get(key, buf, "");
 
     if ((len <= 0) && (defJ != NULL)) {
         rvJ = defJ;

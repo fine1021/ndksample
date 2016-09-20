@@ -6,7 +6,6 @@
 
 #include "util/char.h"
 #include "socket/socket.cpp"
-#include "com_example_fine_ndksample_ndkInterface_HttpUtil.h"
 
 JavaVM *javaVM;
 jobject callbackObj;
