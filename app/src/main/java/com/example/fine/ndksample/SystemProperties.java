@@ -12,6 +12,7 @@ public class SystemProperties {
     private static native String native_get(String key, String def);
 
     static {
+        System.loadLibrary("system_api");
         System.loadLibrary("properties");
     }
 }

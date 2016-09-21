@@ -22,6 +22,7 @@ public class HttpUtil {
     private static native void setCallback(Object object);
 
     static {
+        System.loadLibrary("notify");
         System.loadLibrary("socket");
     }
 

@@ -3,7 +3,6 @@
 //
 
 #include "SystemAPI.h"
-#include <stdio.h>
 #include "util/JNIHelp.h"
 
 const char *className = "com/example/fine/ndksample/SystemProperties";

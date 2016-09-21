@@ -19,15 +19,20 @@ android {
                 // builds and packages all shared object libraries that you define
                 // in your CMake or ndk-build project.
 
-                abiFilters "armeabi-v7a", "armeabi", 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters "armeabi-v7a", "armeabi"
             }
         }
 
-        ndk {
-            // Specifies the ABI configurations of your native libraries
-            // Gradle should build and package with your APK.
+        // if you want to control what Gradle should build, independently of what you want it to package into your APK,
+        // configure another abiFilters flag in the defaultConfig.externalNativeBuild.cmake {} block
+        // (or defaultConfig.externalNativeBuild.ndkBuild {} block). Gradle builds those ABI configurations but only
+        // packages the ones you specify in the defaultConfig.ndk{} block.
+
+        /*ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your APK.
             abiFilters "armeabi-v7a", "armeabi"
-        }
+        }*/
     }
     signingConfigs {
         release {
