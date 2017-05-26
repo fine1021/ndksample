@@ -1,9 +1,11 @@
 //
 // Created by yexiaokang on 2016/4/1.
 //
+#define LOG_NDEBUG 0
+#define LOG_TAG "SystemProperties"
 
-#include "SystemAPI.h"
 #include "util/JNIHelp.h"
+#include <sys/system_properties.h>
 
 const char *className = "com/example/fine/ndksample/SystemProperties";
 
@@ -12,7 +14,7 @@ jstring SystemProperties_native_get(JNIEnv *env, jobject clazz, jstring keyJ, js
 
     int len;
     const char *key;
-    char buf[PROPERTY_VALUE_MAX];
+    char buf[PROP_VALUE_MAX];
     jstring rvJ = NULL;
 
     if (keyJ == NULL) {
@@ -22,7 +24,7 @@ jstring SystemProperties_native_get(JNIEnv *env, jobject clazz, jstring keyJ, js
 
     key = env->GetStringUTFChars(keyJ, NULL);
 
-    len = system_property_get(key, buf, "");
+    len = __system_property_get(key, buf);
 
     if ((len <= 0) && (defJ != NULL)) {
         rvJ = defJ;
@@ -32,7 +34,7 @@ jstring SystemProperties_native_get(JNIEnv *env, jobject clazz, jstring keyJ, js
         rvJ = env->NewStringUTF("");
     }
 
-    LOGI("key = %s, value = %s", key, buf);
+    LOGI("__system_property_get key = %s, value = %s", key, buf);
 
     env->ReleaseStringUTFChars(keyJ, key);
 

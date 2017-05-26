@@ -60,19 +60,12 @@ LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := libsystem_api
-LOCAL_SRC_FILES := libsystem_api.so
-
-include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog -lm
 LOCAL_MODULE := properties
 LOCAL_SRC_FILES := properties.cpp util/JNIHelp.cpp
-LOCAL_SHARED_LIBRARIES := libsystem_api
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
